@@ -7,6 +7,7 @@ import {
   OVERVIEW_INTRO_QA,
   ULTIMATE_THESIS,
 } from '../data/amusingData';
+import { getPodcastEpisodeByBookSlug } from '../data/podcastEpisodesData';
 import type {
   AppRouteMode,
   BookEntry,
@@ -189,7 +190,8 @@ function buildOverviewChapterAnchors(chapters: ChapterProposition[]): OutlineAnc
 
 export function getOutlineAnchorsForView(
   view: ViewMode,
-  dataset: BookReadingDataset = FALLBACK_DATASET
+  dataset: BookReadingDataset = FALLBACK_DATASET,
+  bookSlug?: string | null
 ): OutlineAnchor[] {
   if (view === 'map') {
     const stepAnchors: OutlineAnchor[] = dataset.argumentMapSteps.map((step, idx) => {
@@ -226,6 +228,22 @@ export function getOutlineAnchorsForView(
       index: group.rangeLabel,
       label: group.shortLabel ?? group.title,
     }));
+  }
+
+  if (view === 'podcast') {
+    const episode = getPodcastEpisodeByBookSlug(bookSlug ?? 'amusing-ourselves-to-death');
+    const actAnchors: OutlineAnchor[] = episode
+      ? episode.acts.map((act) => ({
+          id: `podcast-${act.id}`,
+          index: act.indexLabel,
+          label: act.title,
+        }))
+      : [];
+    return [
+      { id: 'podcast-player', index: '收听', label: '双引擎播客播放器' },
+      { id: 'podcast-design', index: '配置', label: '声线与制作准则' },
+      ...actAnchors,
+    ];
   }
 
   const steps = dataset.argumentMapSteps;
@@ -305,7 +323,7 @@ export function getBookBySlug(
   return books.find((b) => b.slug === slug);
 }
 
-const VALID_VIEWS: ReadonlySet<string> = new Set(['map', 'overview', 'key20', 'all']);
+const VALID_VIEWS: ReadonlySet<string> = new Set(['map', 'overview', 'key20', 'all', 'podcast']);
 
 export function parseLocationState(
   search: string,

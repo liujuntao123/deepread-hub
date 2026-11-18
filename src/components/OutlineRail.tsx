@@ -5,6 +5,7 @@ import { getOutlineAnchorsForView } from '../utils/readingFilters';
 
 interface OutlineRailProps {
   bookTitle: string;
+  bookSlug?: string;
   dataset: BookReadingDataset;
   activeView: ViewMode;
   activeAnchorId: string | null;
@@ -13,12 +14,13 @@ interface OutlineRailProps {
 
 export const OutlineRail: React.FC<OutlineRailProps> = ({
   bookTitle,
+  bookSlug,
   dataset,
   activeView,
   activeAnchorId,
   onGoLibrary,
 }) => {
-  const anchors = getOutlineAnchorsForView(activeView, dataset);
+  const anchors = getOutlineAnchorsForView(activeView, dataset, bookSlug);
 
   const handleJump = (id: string) => {
     const el = document.getElementById(id);

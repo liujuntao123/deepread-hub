@@ -5,6 +5,7 @@ import type { AppRouteMode, FontScale, ViewMode } from '../types/reading';
 interface TopBarProps {
   route: AppRouteMode;
   bookTitle?: string;
+  hasPodcast?: boolean;
   activeView: ViewMode;
   onGoLibrary: () => void;
   onSelectView: (view: ViewMode) => void;
@@ -20,11 +21,13 @@ const READER_NAV_ITEMS: { id: ViewMode; label: string }[] = [
   { id: 'overview', label: '洞见概览' },
   { id: 'key20', label: 'Key20' },
   { id: 'all', label: '全篇连读' },
+  { id: 'podcast', label: '双人播客' },
 ];
 
 export const TopBar: React.FC<TopBarProps> = ({
   route,
   bookTitle,
+  hasPodcast = false,
   activeView,
   onGoLibrary,
   onSelectView,
@@ -34,6 +37,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   onToggleTheme,
   progress,
 }) => {
+  const visibleReaderNavItems = hasPodcast
+    ? READER_NAV_ITEMS
+    : READER_NAV_ITEMS.filter((item) => item.id !== 'podcast');
   const scrollToLibraryAnchor = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -85,7 +91,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               书库
             </button>
-            {READER_NAV_ITEMS.map((item) => {
+            {visibleReaderNavItems.map((item) => {
               const isActive = activeView === item.id;
               return (
                 <button
@@ -157,7 +163,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               书库
             </button>
-            {READER_NAV_ITEMS.map((item) => {
+            {visibleReaderNavItems.map((item) => {
               const isActive = activeView === item.id;
               return (
                 <button

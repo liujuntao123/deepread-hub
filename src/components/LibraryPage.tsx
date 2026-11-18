@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowRight, BookOpen, Compass, KeyRound, ListOrdered, RotateCcw, Search, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Compass, Headphones, KeyRound, ListOrdered, RotateCcw, Search, X } from 'lucide-react';
 import type { BookEntry, ViewMode } from '../types/reading';
+import { getPodcastEpisodeByBookSlug } from '../data/podcastEpisodesData';
 import { countKeyOrigins, filterBooks, getBookCategories } from '../utils/readingFilters';
 
 interface LibraryPageProps {
@@ -126,6 +127,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ books, onOpenBook }) =
           <div className="space-y-8">
             {filteredBooks.map((book) => {
               const originCounts = countKeyOrigins(book.dataset.keyInsights);
+              const podcastEpisode = getPodcastEpisodeByBookSlug(book.slug);
               return (
                 <article
                   key={book.slug}
@@ -217,6 +219,14 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ books, onOpenBook }) =
                               {book.readingTimeLabel}
                             </dd>
                           </div>
+                          {podcastEpisode && (
+                            <div className="py-3 flex items-baseline justify-between gap-4">
+                              <dt className="text-stone-500 dark:text-stone-400">双人播客</dt>
+                              <dd className="font-index font-medium text-stone-900 dark:text-stone-100 text-right">
+                                {podcastEpisode.acts.length} 幕全书深读 · 双引擎音频
+                              </dd>
+                            </div>
+                          )}
                           <div className="py-3 last:pb-0 flex items-baseline justify-between gap-4">
                             <dt className="text-stone-500 dark:text-stone-400">依据版本</dt>
                             <dd className="text-stone-700 dark:text-stone-300 text-right">
@@ -262,6 +272,16 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ books, onOpenBook }) =
                               <BookOpen className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" aria-hidden="true" />
                               <span>全篇连读</span>
                             </button>
+                            {podcastEpisode && (
+                              <button
+                                type="button"
+                                onClick={() => onOpenBook(book.slug, 'podcast')}
+                                className="col-span-2 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-[#1E3A8A] dark:text-sky-300 bg-[#EFEAE0]/80 dark:bg-stone-900 border border-[#1E3A8A]/30 dark:border-sky-500/40 rounded hover:border-[#1E3A8A] dark:hover:border-sky-400 transition-colors whitespace-nowrap cursor-pointer"
+                              >
+                                <Headphones className="w-3.5 h-3.5" aria-hidden="true" />
+                                <span>双人播客（全书精讲）</span>
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

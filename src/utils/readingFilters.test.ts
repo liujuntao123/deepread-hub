@@ -218,4 +218,23 @@ test('multi-book registry filters and URL location parsing roundtrip cleanly', (
     buildLocationSearch('reader', 'public-opinion', 'overview'),
     '?book=public-opinion&view=overview'
   );
+  assert.equal(
+    buildLocationSearch('reader', 'amusing-ourselves-to-death', 'podcast'),
+    '?book=amusing-ourselves-to-death&view=podcast'
+  );
+  assert.deepEqual(
+    parseLocationState('?book=amusing-ourselves-to-death&view=podcast', BOOKS_CATALOG),
+    {
+      route: 'reader',
+      bookSlug: 'amusing-ourselves-to-death',
+      view: 'podcast',
+    }
+  );
+
+  const amusing = getBookBySlug(BOOKS_CATALOG, 'amusing-ourselves-to-death');
+  assert.ok(amusing);
+  const podcastAnchors = getOutlineAnchorsForView('podcast', amusing.dataset, amusing.slug);
+  assert.equal(podcastAnchors.length, 9);
+  assert.equal(podcastAnchors[0].id, 'podcast-player');
+  assert.equal(podcastAnchors[2].id, 'podcast-act-1');
 });

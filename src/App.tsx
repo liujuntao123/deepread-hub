@@ -5,8 +5,10 @@ import { Key20Section } from './components/Key20Section';
 import { LibraryPage } from './components/LibraryPage';
 import { OutlineRail } from './components/OutlineRail';
 import { OverviewSection } from './components/OverviewSection';
+import { PodcastSection } from './components/PodcastSection';
 import { TopBar } from './components/TopBar';
 import { BOOKS_CATALOG } from './data/booksRegistry';
+import { getPodcastEpisodeByBookSlug } from './data/podcastEpisodesData';
 import type { AppRouteMode, FontScale, ViewMode } from './types/reading';
 import {
   buildLocationSearch,
@@ -31,6 +33,8 @@ export default function App() {
   const [activeAnchorId, setActiveAnchorId] = useState<string | null>(null);
 
   const activeBook = getBookBySlug(BOOKS_CATALOG, selectedSlug) ?? BOOKS_CATALOG[0];
+  const podcastEpisode = getPodcastEpisodeByBookSlug(activeBook.slug);
+  const hasPodcast = Boolean(podcastEpisode);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -62,7 +66,7 @@ export default function App() {
       return;
     }
 
-    const anchors = getOutlineAnchorsForView(activeView, activeBook.dataset);
+    const anchors = getOutlineAnchorsForView(activeView, activeBook.dataset, activeBook.slug);
 
     const updateScrollState = () => {
       const nextProgress = calculateScrollProgress(
@@ -134,6 +138,7 @@ export default function App() {
       <TopBar
         route={route}
         bookTitle={route === 'reader' ? activeBook.title : undefined}
+        hasPodcast={hasPodcast}
         activeView={activeView}
         onGoLibrary={handleGoLibrary}
         onSelectView={handleSelectView}
@@ -153,6 +158,7 @@ export default function App() {
           <div className="flex gap-12 lg:gap-16">
             <OutlineRail
               bookTitle={activeBook.title}
+              bookSlug={activeBook.slug}
               dataset={activeBook.dataset}
               activeView={activeView}
               activeAnchorId={activeAnchorId}
@@ -199,8 +205,18 @@ export default function App() {
                 />
               )}
 
+              {activeView === 'podcast' && (
+                podcastEpisode ? (
+                  <PodcastSection episode={podcastEpisode} />
+                ) : (
+                  <div className="p-6 border border-stone-200 dark:border-stone-800 rounded-md text-sm text-stone-600 dark:text-stone-400">
+                    《{activeBook.title.replace(/[《》]/g, '')}》的双人播客演播稿与双引擎音频正在排期制作中，目前可先收听《娱乐至死》整书双人播客。
+                  </div>
+                )
+              )}
+
               <div className="pt-8 border-t border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-4">
-                {activeView !== 'all' ? (
+                {activeView !== 'all' && activeView !== 'podcast' ? (
                   <div className="flex flex-wrap items-center gap-3">
                     {activeView === 'map' && (
                       <button

@@ -1,6 +1,6 @@
 export type AppRouteMode = 'library' | 'reader';
 
-export type ViewMode = 'map' | 'overview' | 'key20' | 'all';
+export type ViewMode = 'map' | 'overview' | 'key20' | 'all' | 'podcast';
 
 export type ChapterPart = string;
 
