@@ -12,6 +12,8 @@ export interface PodcastHostProfile {
   edgeVoice: string;
   fishReferenceId: string;
   fishVoiceTitle: string;
+  /** Optional Fish-only rate offset (%) relative to each segment's baseline ratePercent */
+  fishRateOffset?: number;
 }
 
 export interface PodcastSegment {

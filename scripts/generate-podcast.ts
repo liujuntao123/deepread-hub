@@ -3,7 +3,7 @@ import {
   getPodcastAudioStatus,
   isFishApiKeyConfigured,
   synthesizePodcastEpisode,
-} from '../server/ttsEngine.ts';
+} from './ttsEngine.ts';
 import { getPodcastEpisodeByBookSlug } from '../src/data/podcastEpisodesData.ts';
 import type { PodcastTtsProvider } from '../src/types/podcast.ts';
 

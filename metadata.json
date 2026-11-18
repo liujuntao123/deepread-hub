@@ -1,8 +1,5 @@
 {
   "name": "《娱乐至死》领读",
   "description": "尼尔·波兹曼《娱乐至死》问答体深度领读：洞见概览、论证地图与Key20反常识命题解析。",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "requestFramePermissions": []
 }

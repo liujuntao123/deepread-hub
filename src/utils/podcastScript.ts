@@ -1,4 +1,9 @@
-import type { PauseKind, PodcastEpisode, PodcastSegment } from '../types/podcast';
+import type {
+  PauseKind,
+  PodcastEpisode,
+  PodcastSegment,
+  PodcastTtsProvider,
+} from '../types/podcast';
 
 export const PAUSE_DURATION_MS: Record<PauseKind, number> = {
   short: 350,
@@ -101,6 +106,18 @@ export function toEdgeTtsChunks(rawText: string): EdgeTtsChunk[] {
 export function formatEdgeRate(ratePercent: number): string {
   if (ratePercent === 0) return '+0%';
   return ratePercent > 0 ? `+${ratePercent}%` : `${ratePercent}%`;
+}
+
+export function getEffectiveRatePercent(
+  segment: PodcastSegment,
+  provider: PodcastTtsProvider,
+  episode?: PodcastEpisode
+): number {
+  if (provider === 'fish') {
+    const offset = episode?.hosts[segment.hostId]?.fishRateOffset ?? 0;
+    return segment.ratePercent + offset;
+  }
+  return segment.ratePercent;
 }
 
 export function toFishSpeed(ratePercent: number): number {
@@ -240,8 +257,8 @@ export function formatMarkdownPodcastScript(episode: PodcastEpisode): string {
     `> ${episode.subtitle}`,
     '',
     '## 演播角色与声线配置',
-    `- **${episode.hosts.A.name}（${episode.hosts.A.role}）**：Edge TTS \`${episode.hosts.A.edgeVoice}\` ｜ Fish Audio \`${episode.hosts.A.fishVoiceTitle}\` (\`${episode.hosts.A.fishReferenceId}\`)`,
-    `- **${episode.hosts.B.name}（${episode.hosts.B.role}）**：Edge TTS \`${episode.hosts.B.edgeVoice}\` ｜ Fish Audio \`${episode.hosts.B.fishVoiceTitle}\` (\`${episode.hosts.B.fishReferenceId}\`)`,
+    `- **${episode.hosts.A.name}（${episode.hosts.A.role}）**：Edge TTS \`${episode.hosts.A.edgeVoice}\` ｜ Fish Audio \`${episode.hosts.A.fishVoiceTitle}\` (\`${episode.hosts.A.fishReferenceId}\`)${episode.hosts.A.fishRateOffset ? `（Fish 语速偏置 ${formatEdgeRate(episode.hosts.A.fishRateOffset)}）` : ''}`,
+    `- **${episode.hosts.B.name}（${episode.hosts.B.role}）**：Edge TTS \`${episode.hosts.B.edgeVoice}\` ｜ Fish Audio \`${episode.hosts.B.fishVoiceTitle}\` (\`${episode.hosts.B.fishReferenceId}\`)${episode.hosts.B.fishRateOffset ? `（Fish 语速偏置 ${formatEdgeRate(episode.hosts.B.fishRateOffset)}）` : ''}`,
     '',
     '## 停顿与节奏标记说明',
     '- `[pause:short]`：句内换气/转折停顿（350ms），Fish Audio 映射为 `[short pause]`，Edge TTS 切片插入静音。',

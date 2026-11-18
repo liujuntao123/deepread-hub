@@ -31,10 +31,9 @@
 
 ### 2.2 自然感与节奏控制三原则
 1. **长段落内部切分停顿**：凡净文本超过 **75 个汉字** 的段落，均在语义转折、数据列举、引文落脚之前插入显式停顿符（`[pause:short]` / `[pause:medium]`），让长句形成清晰的呼吸段落。
-2. **分句变速拉出声调起伏**：
-   - 原典金句、关键判断、全篇收束：**`-4% ~ -6%`**（Edge TTS `rate` / Fish `prosody.speed: 0.94~0.96`）。
-   - 常规陈述与背景交代：**`-2% ~ +1%`**（`speed: 0.98~1.01`）。
-   - 现场反问、轻快反应、例证列举：**`+2% ~ +4%`**（`speed: 1.02~1.04`）。
+2. **分句变速拉出声调起伏（含双引擎固定语速校准）**：
+   - 演播稿基准 `ratePercent` 按 Edge TTS 听感定调：原典金句、关键判断、全篇收束 **`-4% ~ -6%`**，常规陈述 **`-2% ~ +1%`**，现场反问与例证列举 **`+2% ~ +4%`**。
+   - **Fish Audio 专属偏置**：因 Fish Audio `s2.1-pro-free` 声线自然语速略快于 Edge TTS，在主播配置上通过 `fishRateOffset` 固定独立校准（《娱乐至死》中 Host A 林舟 `fishRateOffset = -2`，即 `speed` 对应基准再减 2%，Host B 保持 `0`），Edge TTS 与 Fish Audio 各自锁定当前定版语速。
 3. **克制型口语连接**：仅在真实思路顿挫、恍然或反问起手处点缀少量自然连接词（如“等一下”“嗯……”“哎，确实”“说白了”“其实”），保持口语感与克制感之间的平衡。
 
 ---
@@ -67,7 +66,7 @@
 
 ### 4.2 引擎 B：Fish Audio `s2.1-pro-free`
 - **接口端点**：`POST https://api.fish.audio/v1/tts`
-- **鉴权**：Header 传入 `Authorization: Bearer $FISH_API_KEY` 与 `model: s2.1-pro-free`（密钥仅通过服务端或离线任务环境变量注入）。
+- **鉴权**：Header 传入 `Authorization: Bearer $FISH_API_KEY` 与 `model: s2.1-pro-free`（密钥仅用于本地离线合成脚本 `scripts/generate-podcast.ts`）。
 - **声线绑定**：
   - 林舟（Host A）：`e6a3424b324040a7aad618b55f4e7163`（*董宇辉* · 温暖叙事男声）
   - 苏晴（Host B）：`048222d36be842f199ec8ac71993dce4`（*金* · 柔和知性女声）
@@ -96,16 +95,16 @@
 
 ## 5. 生产流水线与质检清单
 
-### 5.1 离线任务生成（页面端只读播放）
-音频合成统一在离线任务中完成并落盘至 `public/audio/`；Web 页面端保持纯只读播放职责，读取已就绪音轨并提供收听、下载与文稿联动，对尚未落盘的音轨展示静态“暂无可用音频”提示。
+### 5.1 纯静态前端 + 本地离线合成（无后台服务）
+所有演播稿、MP3 音轨与 `*-timings.json` 时间戳均在本地通过离线脚本生成并落盘至 `public/audio/`；Web 端为纯静态前端（`vite` / `vite build`），直接请求静态 `/audio/` 资源并在浏览器端生成 `.md` 演播稿导出，无需任何后台服务进程。
 
 ```bash
 # 同时生成 Edge TTS 与 Fish Audio s2.1-pro-free 双版本整书播客
-npx tsx scripts/generate-podcast.ts --book amusing-ourselves-to-death --provider both
+npm run podcast:generate -- --book amusing-ourselves-to-death --provider both
 
 # 单独合成某一引擎
-npx tsx scripts/generate-podcast.ts --book amusing-ourselves-to-death --provider edge
-npx tsx scripts/generate-podcast.ts --book amusing-ourselves-to-death --provider fish
+npm run podcast:generate -- --book amusing-ourselves-to-death --provider edge
+npm run podcast:generate -- --book amusing-ourselves-to-death --provider fish
 ```
 
 ### 5.2 发布前必检项

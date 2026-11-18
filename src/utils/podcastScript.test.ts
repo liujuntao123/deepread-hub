@@ -6,6 +6,7 @@ import {
   formatEdgeRate,
   formatMarkdownPodcastScript,
   formatTimeMMSS,
+  getEffectiveRatePercent,
   parsePodcastTextTokens,
   toEdgeTtsChunks,
   toFishAudioChunks,
@@ -62,13 +63,20 @@ test('toFishAudioText and toFishAudioChunks map speaker tags and bracket pauses'
   ]);
 });
 
-test('rate and duration helpers format cleanly', () => {
+test('rate and duration helpers format cleanly and apply Fish host rate offset', () => {
   assert.equal(formatEdgeRate(-5), '-5%');
   assert.equal(formatEdgeRate(0), '+0%');
   assert.equal(formatEdgeRate(4), '+4%');
   assert.equal(toFishSpeed(-5), 0.95);
   assert.equal(toFishSpeed(4), 1.04);
   assert.equal(formatTimeMMSS(305), '05:05');
+
+  const segA = AMUSING_FULL_PODCAST.segments.find((s) => s.hostId === 'A')!;
+  const segB = AMUSING_FULL_PODCAST.segments.find((s) => s.hostId === 'B')!;
+  assert.equal(getEffectiveRatePercent(segA, 'edge', AMUSING_FULL_PODCAST), -2);
+  assert.equal(getEffectiveRatePercent(segA, 'fish', AMUSING_FULL_PODCAST), -4);
+  assert.equal(getEffectiveRatePercent(segB, 'edge', AMUSING_FULL_PODCAST), segB.ratePercent);
+  assert.equal(getEffectiveRatePercent(segB, 'fish', AMUSING_FULL_PODCAST), segB.ratePercent);
 });
 
 test('AMUSING_FULL_PODCAST covers entire book, pause discipline, and production metadata', () => {

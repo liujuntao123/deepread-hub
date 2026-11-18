@@ -23,6 +23,7 @@ export const AMUSING_FULL_PODCAST: PodcastEpisode = {
       edgeVoice: 'zh-CN-YunjianNeural',
       fishReferenceId: 'e6a3424b324040a7aad618b55f4e7163',
       fishVoiceTitle: '董宇辉',
+      fishRateOffset: -2,
     },
     B: {
       id: 'B',

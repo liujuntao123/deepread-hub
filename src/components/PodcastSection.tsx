@@ -20,7 +20,9 @@ import {
   countSpokenCharacters,
   estimateScriptDurationSeconds,
   formatEdgeRate,
+  formatMarkdownPodcastScript,
   formatTimeMMSS,
+  getEffectiveRatePercent,
   parsePodcastTextTokens,
   toFishAudioText,
 } from '../utils/podcastScript';
@@ -39,6 +41,95 @@ const CUE_LABELS_ZH: Record<string, string> = {
   soft: '轻声',
   thoughtful: '思索语气',
 };
+
+interface StaticTimingsPayload {
+  bookSlug: string;
+  provider: PodcastTtsProvider;
+  modelName?: string;
+  generatedAt?: string;
+  durationSec?: number;
+  timings: SegmentTiming[];
+}
+
+async function fetchStaticTrackState(
+  episode: PodcastEpisode,
+  provider: PodcastTtsProvider
+): Promise<ProviderTrackState> {
+  const label = provider === 'edge' ? 'Edge TTS' : 'Fish Audio s2.1-pro-free';
+  const defaultModelName =
+    provider === 'edge'
+      ? `Edge TTS (${episode.hosts.A.edgeVoice} + ${episode.hosts.B.edgeVoice})`
+      : `Fish Audio s2.1-pro-free (${episode.hosts.A.fishVoiceTitle} × ${episode.hosts.B.fishVoiceTitle})`;
+
+  const mp3Url = `/audio/${episode.bookSlug}-podcast-${provider}.mp3`;
+  const timingsUrl = `/audio/${episode.bookSlug}-podcast-${provider}-timings.json`;
+
+  let timingsPayload: StaticTimingsPayload | null = null;
+  try {
+    const timingsRes = await fetch(timingsUrl);
+    if (timingsRes.ok) {
+      const raw = await timingsRes.text();
+      if (!raw.trimStart().startsWith('<')) {
+        const parsed = JSON.parse(raw) as Partial<StaticTimingsPayload>;
+        if (
+          parsed &&
+          parsed.bookSlug === episode.bookSlug &&
+          parsed.provider === provider &&
+          Array.isArray(parsed.timings)
+        ) {
+          timingsPayload = parsed as StaticTimingsPayload;
+        }
+      }
+    }
+  } catch {
+    timingsPayload = null;
+  }
+
+  let audioAvailable = false;
+  let fileSizeBytes: number | null = null;
+  try {
+    const headRes = await fetch(mp3Url, { method: 'HEAD' });
+    const contentType = (headRes.headers.get('content-type') ?? '').toLowerCase();
+    if (headRes.ok && !contentType.includes('text/html')) {
+      audioAvailable = true;
+      const lenHeader = headRes.headers.get('content-length');
+      const parsedLen = lenHeader ? Number.parseInt(lenHeader, 10) : Number.NaN;
+      if (Number.isFinite(parsedLen) && parsedLen > 0) {
+        fileSizeBytes = parsedLen;
+      }
+    } else if (headRes.status === 405 && timingsPayload !== null) {
+      audioAvailable = true;
+    }
+  } catch {
+    audioAvailable = timingsPayload !== null;
+  }
+
+  if (!audioAvailable) {
+    return {
+      provider,
+      label,
+      modelName: defaultModelName,
+      available: false,
+      audioUrl: null,
+      durationSec: null,
+      fileSizeBytes: null,
+      timings: [],
+      generatedAt: null,
+    };
+  }
+
+  return {
+    provider,
+    label,
+    modelName: timingsPayload?.modelName ?? defaultModelName,
+    available: true,
+    audioUrl: mp3Url,
+    durationSec: timingsPayload?.durationSec ?? null,
+    fileSizeBytes,
+    timings: timingsPayload?.timings ?? [],
+    generatedAt: timingsPayload?.generatedAt ?? null,
+  };
+}
 
 interface PodcastSectionProps {
   episode: PodcastEpisode;
@@ -69,11 +160,15 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
     setStatusLoading(true);
     setStatusError(null);
     try {
-      const res = await fetch(`/api/podcast/status?book=${encodeURIComponent(episode.bookSlug)}`);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const data = (await res.json()) as PodcastStatusResponse;
+      const [edge, fish] = await Promise.all([
+        fetchStaticTrackState(episode, 'edge'),
+        fetchStaticTrackState(episode, 'fish'),
+      ]);
+      const data: PodcastStatusResponse = {
+        bookSlug: episode.bookSlug,
+        edge,
+        fish,
+      };
       setStatus(data);
       if (!data.edge.available && data.fish.available) {
         setActiveProvider('fish');
@@ -87,7 +182,7 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
 
   useEffect(() => {
     void loadStatus();
-  }, [episode.bookSlug]);
+  }, [episode]);
 
   const currentTrack: ProviderTrackState | null = useMemo(() => {
     if (!status) return null;
@@ -176,6 +271,19 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
     } catch {
       // Clipboard fallback omitted
     }
+  };
+
+  const handleDownloadMarkdownScript = () => {
+    const markdown = formatMarkdownPodcastScript(episode);
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${episode.bookSlug}-podcast-script.md`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
   };
 
   const displayDuration = duration || currentTrack?.durationSec || estimatedSec;
@@ -413,6 +521,7 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
                   <div>Edge TTS: {host.edgeVoice}</div>
                   <div>
                     Fish Audio: {host.fishVoiceTitle} ({host.fishReferenceId.slice(0, 8)}…)
+                    {host.fishRateOffset ? ` · 语速偏置 ${formatEdgeRate(host.fishRateOffset)}` : ''}
                   </div>
                 </div>
               </div>
@@ -494,14 +603,14 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
               )}
             </button>
 
-            <a
-              href={`/api/podcast/script.md?book=${encodeURIComponent(episode.bookSlug)}`}
-              download={`${episode.bookSlug}-podcast-script.md`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-stone-700 dark:text-stone-200 border border-stone-300 dark:border-stone-700 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            <button
+              type="button"
+              onClick={handleDownloadMarkdownScript}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-stone-700 dark:text-stone-200 border border-stone-300 dark:border-stone-700 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" aria-hidden="true" />
               <span>导出 .md 演播稿</span>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -528,6 +637,7 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
                     const timing = timingsMap.get(seg.id);
                     const isActive = activeTiming?.segmentId === seg.id;
                     const tokens = parsePodcastTextTokens(seg.scriptText);
+                    const effectiveRate = getEffectiveRatePercent(seg, activeProvider, episode);
 
                     return (
                       <article
@@ -550,7 +660,7 @@ export const PodcastSection: React.FC<PodcastSectionProps> = ({ episode }) => {
                               {host.name}
                             </span>
                             <span className="font-index text-[11px] text-stone-500 dark:text-stone-400">
-                              语速 {formatEdgeRate(seg.ratePercent)} · 轮换 {seg.turnGapMs}ms
+                              语速 {formatEdgeRate(effectiveRate)} · 轮换 {seg.turnGapMs}ms
                             </span>
                           </div>
 

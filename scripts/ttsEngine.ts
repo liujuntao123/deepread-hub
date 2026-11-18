@@ -17,6 +17,7 @@ import type {
 } from '../src/types/podcast.ts';
 import {
   formatEdgeRate,
+  getEffectiveRatePercent,
   toEdgeTtsChunks,
   toFishAudioChunks,
   toFishSpeed,
@@ -282,6 +283,7 @@ export async function synthesizePodcastEpisode(
       concurrency,
       async (seg, idx): Promise<BuiltSegmentArtifact> => {
         const host = episode.hosts[seg.hostId];
+        const effectiveRatePercent = getEffectiveRatePercent(seg, provider, episode);
         const chunks =
           provider === 'edge'
             ? toEdgeTtsChunks(seg.scriptText)
@@ -302,11 +304,11 @@ export async function synthesizePodcastEpisode(
             const rawMp3Path = path.join(tempDir, `${chunkTag}.mp3`);
             const audioBuf =
               provider === 'edge'
-                ? await synthesizeEdgeSpeechBuffer(chunk.text, host.edgeVoice, seg.ratePercent)
+                ? await synthesizeEdgeSpeechBuffer(chunk.text, host.edgeVoice, effectiveRatePercent)
                 : await synthesizeFishSpeechBuffer(
                     chunk.text,
                     host.fishReferenceId,
-                    seg.ratePercent,
+                    effectiveRatePercent,
                     fishApiKey
                   );
             await fs.writeFile(rawMp3Path, audioBuf);
