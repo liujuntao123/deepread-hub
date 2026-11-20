@@ -1,0 +1,373 @@
+{
+  "bookSlug": "amusing-ourselves-to-death",
+  "provider": "fish",
+  "modelName": "Fish Audio s2.1-pro-free (董宇辉 × 金)",
+  "generatedAt": "2026-11-20T10:40:16.307Z",
+  "durationSec": 1600.08,
+  "timings": [
+    {
+      "segmentId": "seg-01",
+      "hostId": "A",
+      "startSec": 0.35,
+      "endSec": 27.07,
+      "durationSec": 26.72
+    },
+    {
+      "segmentId": "seg-02",
+      "hostId": "B",
+      "startSec": 27.39,
+      "endSec": 59.44,
+      "durationSec": 32.05
+    },
+    {
+      "segmentId": "seg-03",
+      "hostId": "A",
+      "startSec": 59.74,
+      "endSec": 83.25,
+      "durationSec": 23.51
+    },
+    {
+      "segmentId": "seg-04",
+      "hostId": "B",
+      "startSec": 83.51,
+      "endSec": 107.05,
+      "durationSec": 23.54
+    },
+    {
+      "segmentId": "seg-05",
+      "hostId": "A",
+      "startSec": 107.31,
+      "endSec": 136.77,
+      "durationSec": 29.47
+    },
+    {
+      "segmentId": "seg-06",
+      "hostId": "B",
+      "startSec": 137.09,
+      "endSec": 175.31,
+      "durationSec": 38.21
+    },
+    {
+      "segmentId": "seg-07",
+      "hostId": "A",
+      "startSec": 175.81,
+      "endSec": 198.98,
+      "durationSec": 23.18
+    },
+    {
+      "segmentId": "seg-08",
+      "hostId": "B",
+      "startSec": 199.26,
+      "endSec": 231.03,
+      "durationSec": 31.76
+    },
+    {
+      "segmentId": "seg-09",
+      "hostId": "A",
+      "startSec": 231.31,
+      "endSec": 269.7,
+      "durationSec": 38.4
+    },
+    {
+      "segmentId": "seg-10",
+      "hostId": "B",
+      "startSec": 270,
+      "endSec": 300.2,
+      "durationSec": 30.2
+    },
+    {
+      "segmentId": "seg-11",
+      "hostId": "A",
+      "startSec": 300.46,
+      "endSec": 333.16,
+      "durationSec": 32.7
+    },
+    {
+      "segmentId": "seg-12",
+      "hostId": "B",
+      "startSec": 333.44,
+      "endSec": 369.36,
+      "durationSec": 35.92
+    },
+    {
+      "segmentId": "seg-13",
+      "hostId": "A",
+      "startSec": 369.62,
+      "endSec": 402.09,
+      "durationSec": 32.47
+    },
+    {
+      "segmentId": "seg-14",
+      "hostId": "B",
+      "startSec": 402.39,
+      "endSec": 429.92,
+      "durationSec": 27.53
+    },
+    {
+      "segmentId": "seg-15",
+      "hostId": "A",
+      "startSec": 430.44,
+      "endSec": 456.99,
+      "durationSec": 26.55
+    },
+    {
+      "segmentId": "seg-16",
+      "hostId": "B",
+      "startSec": 457.25,
+      "endSec": 482.49,
+      "durationSec": 25.23
+    },
+    {
+      "segmentId": "seg-17",
+      "hostId": "A",
+      "startSec": 482.75,
+      "endSec": 526.05,
+      "durationSec": 43.31
+    },
+    {
+      "segmentId": "seg-18",
+      "hostId": "B",
+      "startSec": 526.33,
+      "endSec": 557.37,
+      "durationSec": 31.03
+    },
+    {
+      "segmentId": "seg-19",
+      "hostId": "A",
+      "startSec": 557.63,
+      "endSec": 592.11,
+      "durationSec": 34.48
+    },
+    {
+      "segmentId": "seg-20",
+      "hostId": "B",
+      "startSec": 592.39,
+      "endSec": 630.32,
+      "durationSec": 37.93
+    },
+    {
+      "segmentId": "seg-21",
+      "hostId": "A",
+      "startSec": 630.6,
+      "endSec": 664.4,
+      "durationSec": 33.8
+    },
+    {
+      "segmentId": "seg-22",
+      "hostId": "B",
+      "startSec": 664.92,
+      "endSec": 683.63,
+      "durationSec": 18.71
+    },
+    {
+      "segmentId": "seg-23",
+      "hostId": "A",
+      "startSec": 683.89,
+      "endSec": 709.33,
+      "durationSec": 25.44
+    },
+    {
+      "segmentId": "seg-24",
+      "hostId": "B",
+      "startSec": 709.61,
+      "endSec": 742.14,
+      "durationSec": 32.52
+    },
+    {
+      "segmentId": "seg-25",
+      "hostId": "A",
+      "startSec": 742.42,
+      "endSec": 777.36,
+      "durationSec": 34.95
+    },
+    {
+      "segmentId": "seg-26",
+      "hostId": "B",
+      "startSec": 777.64,
+      "endSec": 813.33,
+      "durationSec": 35.68
+    },
+    {
+      "segmentId": "seg-27",
+      "hostId": "A",
+      "startSec": 813.61,
+      "endSec": 851.85,
+      "durationSec": 38.24
+    },
+    {
+      "segmentId": "seg-28",
+      "hostId": "B",
+      "startSec": 852.37,
+      "endSec": 876.33,
+      "durationSec": 23.96
+    },
+    {
+      "segmentId": "seg-29",
+      "hostId": "A",
+      "startSec": 876.59,
+      "endSec": 909.63,
+      "durationSec": 33.04
+    },
+    {
+      "segmentId": "seg-30",
+      "hostId": "B",
+      "startSec": 909.91,
+      "endSec": 943.66,
+      "durationSec": 33.75
+    },
+    {
+      "segmentId": "seg-31",
+      "hostId": "A",
+      "startSec": 943.92,
+      "endSec": 979.24,
+      "durationSec": 35.31
+    },
+    {
+      "segmentId": "seg-32",
+      "hostId": "B",
+      "startSec": 979.52,
+      "endSec": 1006.13,
+      "durationSec": 26.62
+    },
+    {
+      "segmentId": "seg-33",
+      "hostId": "A",
+      "startSec": 1006.45,
+      "endSec": 1030.62,
+      "durationSec": 24.16
+    },
+    {
+      "segmentId": "seg-34",
+      "hostId": "B",
+      "startSec": 1030.88,
+      "endSec": 1060.79,
+      "durationSec": 29.91
+    },
+    {
+      "segmentId": "seg-35",
+      "hostId": "A",
+      "startSec": 1061.05,
+      "endSec": 1099,
+      "durationSec": 37.95
+    },
+    {
+      "segmentId": "seg-36",
+      "hostId": "B",
+      "startSec": 1099.54,
+      "endSec": 1108.95,
+      "durationSec": 9.41
+    },
+    {
+      "segmentId": "seg-37",
+      "hostId": "A",
+      "startSec": 1109.19,
+      "endSec": 1139.18,
+      "durationSec": 29.99
+    },
+    {
+      "segmentId": "seg-38",
+      "hostId": "B",
+      "startSec": 1139.44,
+      "endSec": 1172.83,
+      "durationSec": 33.38
+    },
+    {
+      "segmentId": "seg-39",
+      "hostId": "A",
+      "startSec": 1173.11,
+      "endSec": 1197.74,
+      "durationSec": 24.63
+    },
+    {
+      "segmentId": "seg-40",
+      "hostId": "B",
+      "startSec": 1198.04,
+      "endSec": 1220.45,
+      "durationSec": 22.41
+    },
+    {
+      "segmentId": "seg-41",
+      "hostId": "A",
+      "startSec": 1220.71,
+      "endSec": 1263.08,
+      "durationSec": 42.37
+    },
+    {
+      "segmentId": "seg-42",
+      "hostId": "B",
+      "startSec": 1263.36,
+      "endSec": 1304.97,
+      "durationSec": 41.61
+    },
+    {
+      "segmentId": "seg-43",
+      "hostId": "A",
+      "startSec": 1305.51,
+      "endSec": 1324.93,
+      "durationSec": 19.42
+    },
+    {
+      "segmentId": "seg-44",
+      "hostId": "B",
+      "startSec": 1325.19,
+      "endSec": 1359.09,
+      "durationSec": 33.9
+    },
+    {
+      "segmentId": "seg-45",
+      "hostId": "A",
+      "startSec": 1359.35,
+      "endSec": 1392.29,
+      "durationSec": 32.94
+    },
+    {
+      "segmentId": "seg-46",
+      "hostId": "B",
+      "startSec": 1392.59,
+      "endSec": 1434.57,
+      "durationSec": 41.98
+    },
+    {
+      "segmentId": "seg-47",
+      "hostId": "A",
+      "startSec": 1434.91,
+      "endSec": 1468.24,
+      "durationSec": 33.33
+    },
+    {
+      "segmentId": "seg-48",
+      "hostId": "B",
+      "startSec": 1468.52,
+      "endSec": 1493.39,
+      "durationSec": 24.87
+    },
+    {
+      "segmentId": "seg-49",
+      "hostId": "A",
+      "startSec": 1493.65,
+      "endSec": 1530.27,
+      "durationSec": 36.62
+    },
+    {
+      "segmentId": "seg-50",
+      "hostId": "B",
+      "startSec": 1530.59,
+      "endSec": 1551.17,
+      "durationSec": 20.58
+    },
+    {
+      "segmentId": "seg-51",
+      "hostId": "A",
+      "startSec": 1551.47,
+      "endSec": 1578.48,
+      "durationSec": 27.01
+    },
+    {
+      "segmentId": "seg-52",
+      "hostId": "B",
+      "startSec": 1578.88,
+      "endSec": 1599.41,
+      "durationSec": 20.53
+    }
+  ]
+}
