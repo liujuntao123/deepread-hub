@@ -10,6 +10,9 @@ import {
 } from './amusingData';
 import { PUBLIC_OPINION_DATASET } from './publicOpinionData';
 import { XIANGTU_DATASET } from './xiangtuData';
+import { SAPIENS_DATASET } from './sapiensData';
+import { HOMO_DEUS_DATASET } from './homoDeusData';
+import { TWENTY_ONE_LESSONS_DATASET } from './twentyOneLessonsData';
 
 export const BOOKS_CATALOG: BookEntry[] = [
   {
@@ -60,5 +63,47 @@ export const BOOKS_CATALOG: BookEntry[] = [
     premiseHook:
       '1914 年 9 月，太平洋一座孤岛上的英、法、德侨民直到英国邮轮靠岸，才得知祖国早在一个半月前已经互相宣战——过去六周里仇敌还在和平共饮下午茶。李普曼从这场迟到六周的新闻错位起手，追问只能靠“拟态环境”认识世界的大众，究竟凭什么支撑现代民主。',
     dataset: PUBLIC_OPINION_DATASET,
+  },
+  {
+    slug: 'sapiens',
+    title: '《人类简史》',
+    originalTitle: 'Sapiens: A Brief History of Humankind（从动物到上帝）',
+    author: '尤瓦尔·赫拉利',
+    translator: '林俊宏 译',
+    publisherInfo: '中信出版社 2014',
+    publicationYear: '2012',
+    category: '人类史与未来议题',
+    readingTimeLabel: '约 32 分钟通读',
+    premiseHook:
+      '约 10 万年前智人第一次走出非洲，竟被体格更壮、脑容量更大的尼安德特人赶回了老家；可约 7 万年前再次出击，智人却横扫全球。赫拉利从这场逆转与“拆光厂房员工依然存在的标致汽车”切入，追问靠“虚构故事”跃居食物链顶端的动物，如何一步步握有神力却连自己想要什么都答不上来。',
+    dataset: SAPIENS_DATASET,
+  },
+  {
+    slug: 'homo-deus',
+    title: '《未来简史》',
+    originalTitle: 'Homo Deus: A Brief History of Tomorrow（从智人到智神）',
+    author: '尤瓦尔·赫拉利',
+    translator: '林俊宏 译',
+    publisherInfo: '中信出版社 2017',
+    publicationYear: '2016',
+    category: '人类史与未来议题',
+    readingTimeLabel: '约 26 分钟通读',
+    premiseHook:
+      '2012 年全球死于战争与犯罪者合计约 62 万人，而自杀者有 80 万、死于糖尿病的更高达 150 万——今天，糖比火药更致命。赫拉利从旧天敌退场后的新议程起笔，追问当实验室拆穿自由意志、智能与意识彻底大分离，人类是否正把权威拱手让给“数据主义”。',
+    dataset: HOMO_DEUS_DATASET,
+  },
+  {
+    slug: '21-lessons-for-the-21st-century',
+    title: '《今日简史》',
+    originalTitle: '21 Lessons for the 21st Century（人类命运大议题）',
+    author: '尤瓦尔·赫拉利',
+    translator: '林俊宏 译',
+    publisherInfo: '中信出版社 2018',
+    publicationYear: '2018',
+    category: '人类史与未来议题',
+    readingTimeLabel: '约 34 分钟通读',
+    premiseHook:
+      '1938 年人类还有三种全球大故事可选，1968 年剩两个，1998 年剩一个，到 2018 年竟骤降为 0；而 2017 年底 AlphaZero 仅靠 4 小时零棋谱自学就击溃了世界冠军程序。赫拉利直面信息噪音时代的 21 堂现实急课，追问普通人如何在算法黑进人体之前保持清醒、守住自己。',
+    dataset: TWENTY_ONE_LESSONS_DATASET,
   },
 ];

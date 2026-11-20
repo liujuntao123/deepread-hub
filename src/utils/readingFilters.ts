@@ -223,11 +223,16 @@ export function getOutlineAnchorsForView(
   }
 
   if (view === 'key20') {
-    return dataset.keyGroups.map((group) => ({
-      id: `key-group-${group.id}`,
-      index: group.rangeLabel,
-      label: group.shortLabel ?? group.title,
-    }));
+    return dataset.keyGroups.map((group) => {
+      const rawLabel = group.shortLabel ?? group.title;
+      const prefix = `${group.rangeLabel} `;
+      const label = rawLabel.startsWith(prefix) ? rawLabel.slice(prefix.length) : rawLabel;
+      return {
+        id: `key-group-${group.id}`,
+        index: group.rangeLabel,
+        label,
+      };
+    });
   }
 
   if (view === 'podcast') {

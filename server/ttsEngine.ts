@@ -283,7 +283,6 @@ export async function synthesizePodcastEpisode(
       concurrency,
       async (seg, idx): Promise<BuiltSegmentArtifact> => {
         const host = episode.hosts[seg.hostId];
-        const effectiveRatePercent = getEffectiveRatePercent(seg, provider, episode);
         const chunks =
           provider === 'edge'
             ? toEdgeTtsChunks(seg.scriptText)
@@ -302,13 +301,14 @@ export async function synthesizePodcastEpisode(
             await createSilenceWav(chunk.silenceMs ?? 350, wavPath);
           } else if (chunk.text) {
             const rawMp3Path = path.join(tempDir, `${chunkTag}.mp3`);
+            const effectiveRate = getEffectiveRatePercent(seg, provider, episode);
             const audioBuf =
               provider === 'edge'
-                ? await synthesizeEdgeSpeechBuffer(chunk.text, host.edgeVoice, effectiveRatePercent)
+                ? await synthesizeEdgeSpeechBuffer(chunk.text, host.edgeVoice, effectiveRate)
                 : await synthesizeFishSpeechBuffer(
                     chunk.text,
                     host.fishReferenceId,
-                    effectiveRatePercent,
+                    effectiveRate,
                     fishApiKey
                   );
             await fs.writeFile(rawMp3Path, audioBuf);

@@ -3,7 +3,7 @@ import {
   getPodcastAudioStatus,
   isFishApiKeyConfigured,
   synthesizePodcastEpisode,
-} from './ttsEngine.ts';
+} from '../server/ttsEngine.ts';
 import { getPodcastEpisodeByBookSlug } from '../src/data/podcastEpisodesData.ts';
 import type { PodcastTtsProvider } from '../src/types/podcast.ts';
 
@@ -40,7 +40,7 @@ async function main() {
       continue;
     }
 
-    const result = await synthesizePodcastEpisode(target, episode, (msg) => {
+    const result = await synthesizePodcastEpisode(target, episode, (msg: string) => {
       console.log(msg);
     });
     console.log(

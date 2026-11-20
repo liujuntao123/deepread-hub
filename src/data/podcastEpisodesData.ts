@@ -1,4 +1,9 @@
 import type { PodcastEpisode } from '../types/podcast';
+import { SAPIENS_FULL_PODCAST } from './sapiensPodcastData';
+import { HOMO_DEUS_FULL_PODCAST } from './homoDeusPodcastData';
+import { TWENTY_ONE_LESSONS_FULL_PODCAST } from './twentyOneLessonsPodcastData';
+
+export { SAPIENS_FULL_PODCAST, HOMO_DEUS_FULL_PODCAST, TWENTY_ONE_LESSONS_FULL_PODCAST };
 
 export const AMUSING_FULL_PODCAST: PodcastEpisode = {
   id: 'amusing-full-v1',
@@ -720,7 +725,12 @@ export const AMUSING_FULL_PODCAST: PodcastEpisode = {
   ],
 };
 
-export const PODCAST_EPISODES: PodcastEpisode[] = [AMUSING_FULL_PODCAST];
+export const PODCAST_EPISODES: PodcastEpisode[] = [
+  AMUSING_FULL_PODCAST,
+  SAPIENS_FULL_PODCAST,
+  HOMO_DEUS_FULL_PODCAST,
+  TWENTY_ONE_LESSONS_FULL_PODCAST,
+];
 
 export const PODCAST_EPISODES_BY_BOOK: Record<string, PodcastEpisode> = Object.fromEntries(
   PODCAST_EPISODES.map((ep) => [ep.bookSlug, ep])
