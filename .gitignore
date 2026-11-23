@@ -1,8 +1,19 @@
 node_modules/
 build/
 dist/
+dist-workbench/
 coverage/
+.cache/
 .DS_Store
 *.log
 .env*
 !.env.example
+
+# Local-only raw book sources & large binary media artifacts
+artifacts/sources/
+artifacts/**/*.mp3
+artifacts/**/*.wav
+artifacts/**/*.mp4
+artifacts/**/*.mov
+artifacts/**/video/frames/
+artifacts/_style-samples/

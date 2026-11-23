@@ -1,16 +1,23 @@
 {
-  "name": "react-example",
+  "name": "deepread-hub",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port=3000 --host=0.0.0.0",
-    "clean": "rm -rf dist",
+    "preview": "vite preview",
+    "workbench": "vite --config vite.workbench.config.ts",
+    "workbench:build": "vite build --config vite.workbench.config.ts",
+    "podcast:generate": "NODE_USE_ENV_PROXY=1 tsx pipelines/podcast/generate.ts",
+    "podcast:export": "tsx pipelines/podcast/export-scripts.ts",
+    "video:storyboard": "tsx pipelines/video/build-storyboard.ts",
+    "video:image": "NODE_USE_ENV_PROXY=1 tsx pipelines/video/generate-image.ts",
+    "video:render": "tsx pipelines/video/render-video.ts",
+    "audit": "tsx pipelines/audit.ts",
     "lint": "tsc --noEmit",
-    "test": "tsx --test src/utils/*.test.ts",
-    "podcast:generate": "tsx scripts/generate-podcast.ts"
+    "test": "tsx --test content/reading/filters.test.ts content/podcast/script.test.ts",
+    "clean": "rm -rf dist dist-workbench"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -28,6 +35,8 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"

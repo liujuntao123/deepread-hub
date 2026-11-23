@@ -1,0 +1,73 @@
+import type { PodcastTtsProvider } from '../../content/podcast/types';
+
+export type VideoAspectRatio = '16:9' | '9:16';
+
+export type VideoSceneLayout =
+  | 'act-title-card'
+  | 'editorial-illustration'
+  | 'quote-spotlight'
+  | 'data-contrast'
+  | 'closing-card';
+
+export type KenBurnsMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'static';
+
+export interface VideoStyleBible {
+  /** Shared art-direction prefix prepended to every GPT Image 2.5 prompt */
+  promptPrefix: string;
+  /** Explicit negative/avoidance instructions (e.g. "no text, no Chinese characters, no watermarks") */
+  promptSuffix: string;
+  /** Book-specific accent palette aligned with the reading UI */
+  palette: {
+    paperBg: string;
+    inkPrimary: string;
+    accent: string;
+  };
+}
+
+export interface VideoSceneOverlay {
+  chapterTag?: string;
+  headline?: string;
+  quoteZh?: string;
+  quoteEn?: string;
+  quoteSource?: string;
+  statItems?: Array<{
+    label: string;
+    value: string;
+    highlight?: boolean;
+  }>;
+}
+
+export interface VideoStoryboardScene {
+  sceneId: string;
+  actId: string;
+  startSegmentId: string;
+  endSegmentId: string;
+  /** Resolved directly from artifacts/<slug>/podcast/<provider>.timings.json */
+  startSec: number;
+  endSec: number;
+  layout: VideoSceneLayout;
+  motion: KenBurnsMotion;
+  /** Required for editorial-illustration scenes; omitted for pure code-driven typography/data cards */
+  imagePrompt?: string;
+  /** Relative filename under artifacts/<slug>/video/frames/, e.g. "scene-02.png" */
+  imageFile?: string;
+  /** SHA-256 prefix of (styleBible + imagePrompt) for incremental re-roll caching */
+  promptHash?: string;
+  overlay?: VideoSceneOverlay;
+}
+
+export interface VideoStoryboard {
+  schemaVersion: '1.0';
+  bookSlug: string;
+  bookTitle: string;
+  episodeTitle: string;
+  audioProvider: PodcastTtsProvider;
+  aspectRatio: VideoAspectRatio;
+  fps: 30;
+  width: number;
+  height: number;
+  totalDurationSec: number;
+  generatedAt: string;
+  styleBible: VideoStyleBible;
+  scenes: VideoStoryboardScene[];
+}

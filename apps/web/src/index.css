@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: "Inter", "Helvetica Neue", "Noto Sans SC", system-ui, sans-serif;
+    --font-sans: "Inter", "Helvetica Neue", "Noto Sans SC", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --swiss-canvas: #F4F4F0;
+    --swiss-surface: #FFFFFF;
+    --swiss-surface-alt: #EAEAE4;
+    --swiss-ink: #0A0A0A;
+    --swiss-ink-muted: #52524E;
+    --swiss-rule: #D0D0C8;
+    --swiss-accent: #E10600;
+  }
+
+  html.dark {
+    --swiss-canvas: #0B0B0B;
+    --swiss-surface: #141414;
+    --swiss-surface-alt: #1C1C1A;
+    --swiss-ink: #F4F4F0;
+    --swiss-ink-muted: #A1A19A;
+    --swiss-rule: #2A2A27;
+    --swiss-accent: #FF2A1F;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--swiss-canvas);
+    color: var(--swiss-ink);
+  }
+
+  ::selection {
+    background-color: #E10600;
+    color: #FFFFFF;
+  }
+}
+
+/* Swiss International Typographic Style utility classes */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.028em;
+}
+
+.font-editorial {
+  font-family: var(--font-sans);
+}
+
+.font-ui {
+  font-family: var(--font-sans);
+}
+
+.font-index {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.swiss-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-balance-title {
+  text-wrap: balance;
+}
