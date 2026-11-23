@@ -15,11 +15,11 @@ interface TopBarProps {
   progress: number;
 }
 
-const READER_NAV_ITEMS: { id: ViewMode; code: string; label: string }[] = [
-  { id: 'map', code: '01', label: '论证地图' },
-  { id: 'overview', code: '02', label: '洞见概览' },
-  { id: 'key20', code: '03', label: 'Key20' },
-  { id: 'all', code: 'ALL', label: '全篇连读' },
+const READER_NAV_ITEMS: { id: ViewMode; code: string; label: string; mobileLabel: string }[] = [
+  { id: 'map', code: '01', label: '论证地图', mobileLabel: '地图' },
+  { id: 'overview', code: '02', label: '洞见概览', mobileLabel: '概览' },
+  { id: 'key20', code: '03', label: 'Key20', mobileLabel: 'Key20' },
+  { id: 'all', code: 'ALL', label: '全篇连读', mobileLabel: '连读' },
 ];
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -43,7 +43,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-[#F4F4F0] dark:bg-[#0B0B0B] border-b-2 border-[#0A0A0A] dark:border-[#F4F4F0]">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-stretch justify-between gap-4">
+      <div className="max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-stretch justify-between gap-2 sm:gap-4">
         <a
           href="?"
           onClick={(e) => {
@@ -51,13 +51,13 @@ export const TopBar: React.FC<TopBarProps> = ({
             onGoLibrary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="inline-flex items-center gap-3 pr-5 border-r border-[#D0D0C8] dark:border-[#2A2A27] whitespace-nowrap shrink-0 group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
+          className="inline-flex items-center gap-2 sm:gap-3 md:pr-5 md:border-r border-[#D0D0C8] dark:border-[#2A2A27] whitespace-nowrap shrink-0 group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
         >
           <span
             aria-hidden="true"
-            className="w-3.5 h-3.5 bg-[#E10600] dark:bg-[#FF2A1F] shrink-0 transition-transform duration-150 group-hover:scale-110"
+            className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[#E10600] dark:bg-[#FF2A1F] shrink-0 transition-transform duration-150 group-hover:scale-110"
           />
-          <span className="font-display text-base font-extrabold tracking-tight text-[#0A0A0A] dark:text-[#F4F4F0]">
+          <span className="font-display text-[15px] sm:text-base font-extrabold tracking-tight text-[#0A0A0A] dark:text-[#F4F4F0]">
             深度领读集
           </span>
           <span className="hidden sm:inline font-index text-[10px] font-semibold tracking-[0.16em] uppercase text-[#52524E] dark:text-[#A1A19A]">
@@ -112,7 +112,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 >
                   <span
                     className={`font-index text-[10px] ${
-                      isActive ? 'text-[#FF2A1F] dark:text-[#E10600]' : 'text-[#73736C] dark:text-[#73736C]'
+                      isActive ? 'text-[#FF2A1F] dark:text-[#E10600]' : 'text-[#73736C]'
                     }`}
                   >
                     {item.code}
@@ -130,7 +130,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </nav>
         )}
 
-        <div className="flex items-center gap-2 shrink-0 ml-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
           {route === 'reader' && (
             <button
               type="button"
@@ -141,7 +141,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   : '切换正文字号，当前放大'
               }
               title={fontScale === 'standard' ? '正文字号：标准（点击放大）' : '正文字号：放大（点击恢复）'}
-              className="inline-flex items-center gap-1.5 px-2.5 h-8 text-xs font-index font-medium text-[#0A0A0A] dark:text-[#F4F4F0] border border-[#0A0A0A] dark:border-[#44443F] hover:bg-[#0A0A0A] hover:text-[#F4F4F0] dark:hover:bg-[#F4F4F0] dark:hover:text-[#0A0A0A] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
+              className="inline-flex items-center gap-1 px-2 sm:px-2.5 h-8 text-xs font-index font-medium text-[#0A0A0A] dark:text-[#F4F4F0] border border-[#0A0A0A] dark:border-[#44443F] hover:bg-[#0A0A0A] hover:text-[#F4F4F0] dark:hover:bg-[#F4F4F0] dark:hover:text-[#0A0A0A] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
             >
               <Type className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{fontScale === 'standard' ? 'A' : 'A+'}</span>
@@ -151,7 +151,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <button
             type="button"
             onClick={onToggleTheme}
-            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs font-semibold tracking-wider text-[#0A0A0A] dark:text-[#F4F4F0] border border-[#0A0A0A] dark:border-[#F4F4F0] hover:bg-[#0A0A0A] hover:text-[#F4F4F0] dark:hover:bg-[#F4F4F0] dark:hover:text-[#0A0A0A] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 h-8 text-xs font-semibold tracking-wider text-[#0A0A0A] dark:text-[#F4F4F0] border border-[#0A0A0A] dark:border-[#F4F4F0] hover:bg-[#0A0A0A] hover:text-[#F4F4F0] dark:hover:bg-[#F4F4F0] dark:hover:text-[#0A0A0A] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E10600]"
           >
             {isDark ? (
               <>
@@ -179,7 +179,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               onClick={onGoLibrary}
               className="py-2.5 text-[11px] font-semibold text-[#52524E] dark:text-[#A1A19A] text-center cursor-pointer"
             >
-              书库
+              ← 书库
             </button>
             {READER_NAV_ITEMS.map((item) => {
               const isActive = activeView === item.id;
@@ -189,13 +189,19 @@ export const TopBar: React.FC<TopBarProps> = ({
                   type="button"
                   onClick={() => onSelectView(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`py-2.5 text-[11px] font-semibold text-center transition-colors cursor-pointer ${
+                  className={`relative py-2.5 text-[11px] font-semibold text-center transition-colors cursor-pointer ${
                     isActive
                       ? 'bg-[#0A0A0A] text-[#F4F4F0] dark:bg-[#F4F4F0] dark:text-[#0A0A0A]'
                       : 'text-[#52524E] dark:text-[#A1A19A]'
                   }`}
                 >
-                  {item.label}
+                  <span>{item.mobileLabel}</span>
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-0 h-[3px] bg-[#E10600] dark:bg-[#FF2A1F]"
+                    />
+                  )}
                 </button>
               );
             })}
