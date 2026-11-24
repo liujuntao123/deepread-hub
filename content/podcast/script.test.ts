@@ -226,6 +226,30 @@ test('all registered podcast episodes auto-validate against reading catalog, can
   }
 });
 
+/**
+ * Overwrought marketing / AI-cliche expressions discouraged in natural spoken Chinese scripts.
+ */
+const SPOKEN_STYLE_CLICHE_PATTERNS: RegExp[] = [
+  /振聋发聩/,
+  /摄人心魄/,
+  /一锤定音/,
+  /破圈/,
+  /太扎心了/,
+  /笑死人/,
+  /掀开了?.{0,4}底牌/,
+  /挂了科/,
+  /打了个反证/,
+  /堪称经典/,
+];
+
+/**
+ * Un-translated multi-word English phrases or long English academic terms that degrade Chinese TTS prosody.
+ * Short abbreviations like KMBC or AI remain allowed.
+ */
+const UNTRANSLATED_ENGLISH_PROSODY_PATTERN = /\b[A-Za-z]{8,}\b|\b[A-Za-z]{2,}\s+[A-Za-z]{2,}\b/;
+
+const MAX_CONTINUOUS_SPOKEN_CLAUSE_CHARS = 105;
+
 test('all podcast episodes spoken scriptText is self-contained without false-positive rejection of natural speech', () => {
   // Sanity-check regex precision: natural phrases allowed, explicit UI/list references rejected
   const allowedNatural = '这正是第二十六章画下的第一条制度铁律。';
@@ -251,6 +275,53 @@ test('all podcast episodes spoken scriptText is self-contained without false-pos
           false,
           `${episode.bookSlug} segment ${seg.id} spoken text leaked external context (${pattern}): ${plain}`
         );
+      }
+    }
+  }
+});
+
+test('all podcast episodes enforce natural Chinese spoken style, clause breathability, and TTS-friendly phrasing', () => {
+  // Sanity-check style guards
+  for (const bad of ['这句振聋发聩的断语堪称经典', '这里引入了 Ideal Type 概念', '它属于 Gemeinschaft 社会']) {
+    const caught =
+      SPOKEN_STYLE_CLICHE_PATTERNS.some((p) => p.test(bad)) ||
+      UNTRANSLATED_ENGLISH_PROSODY_PATTERN.test(bad);
+    assert.equal(caught, true, `Expected style guard to catch: ${bad}`);
+  }
+  assert.equal(
+    UNTRANSLATED_ENGLISH_PROSODY_PATTERN.test('1981 年堪萨斯市 KMBC 电视台解雇了女主播'),
+    false,
+    'Short station abbreviations like KMBC should remain allowed'
+  );
+
+  for (const episode of PODCAST_EPISODES) {
+    for (const seg of episode.segments) {
+      const plain = toPlainReadableText(seg.scriptText);
+      for (const pattern of SPOKEN_STYLE_CLICHE_PATTERNS) {
+        assert.equal(
+          pattern.test(plain),
+          false,
+          `${episode.bookSlug} segment ${seg.id} contains overwrought spoken cliche (${pattern}): ${plain}`
+        );
+      }
+      assert.equal(
+        UNTRANSLATED_ENGLISH_PROSODY_PATTERN.test(plain),
+        false,
+        `${episode.bookSlug} segment ${seg.id} contains long/multi-word English that hurts Chinese TTS prosody: ${plain}`
+      );
+
+      // Check continuous spoken clause length between pauses and sentence-ending punctuation
+      const textParts = parsePodcastTextTokens(seg.scriptText)
+        .filter((t) => t.type === 'text')
+        .map((t) => t.value);
+      for (const part of textParts) {
+        for (const clause of part.split(/[。！？；]/)) {
+          const cleanLen = clause.replace(/\s+/g, '').length;
+          assert.ok(
+            cleanLen <= MAX_CONTINUOUS_SPOKEN_CLAUSE_CHARS,
+            `${episode.bookSlug} segment ${seg.id} has an overly long unbroken clause (${cleanLen} chars > ${MAX_CONTINUOUS_SPOKEN_CLAUSE_CHARS}): ${clause}`
+          );
+        }
       }
     }
   }

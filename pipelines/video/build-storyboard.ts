@@ -3,7 +3,7 @@ import path from 'node:path';
 import { getPodcastEpisodeByBookSlug } from '../../content/podcast/registry.ts';
 import type { PodcastTtsProvider, SegmentTiming } from '../../content/podcast/types.ts';
 import { estimateScriptDurationSeconds } from '../../content/podcast/script.ts';
-import { VIDEO_PLANS_BY_BOOK } from './plans/amusing.ts';
+import { VIDEO_PLANS_BY_BOOK } from './plans/index.ts';
 import { DEFAULT_VIDEO_STYLE_BIBLE } from './styleBible.ts';
 import type { VideoStoryboard, VideoStoryboardScene } from './types.ts';
 

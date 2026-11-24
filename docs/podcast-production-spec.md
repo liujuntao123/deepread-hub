@@ -29,13 +29,16 @@
 - **Host A（林舟 · 主讲）**：负责叙事主轴、历史现场复原、数据举证与原典精句引述，语调明朗笃定、叙事有推进感。
 - **Host B（苏晴 · 对谈）**：代表具备思辨力的听众视角，负责提出常识反驳（例如围绕具体现象发问或辨析边界）、拆解隐喻并承接逻辑转折，以实质性追问推动对话向前。
 
-### 2.2 自然感与节奏控制三原则
-1. **长段落内部切分停顿**：凡净文本超过 **75 个汉字** 的段落，均在语义转折、数据列举、引文落脚之前插入显式停顿符（`[pause:short]` / `[pause:medium]`），让长句形成清晰的呼吸段落。
+### 2.2 自然感与节奏控制四原则
+1. **长段落内部切分停顿**：凡净文本超过 **75 个汉字** 的段落，均在语义转折、数据列举、引文落脚之前插入显式停顿符（`[pause:short]` / `[pause:medium]`），且按停顿符与句末标点切分后的单句连续口播长度控制在 **105 字以内**，让长句形成清晰的呼吸段落。
 2. **分句变速与音高基调校准**：
    - 演播稿基准 `ratePercent` 按自然叙事节奏定调：原典金句、关键判断、全篇收束 **`-4% ~ -6%`**，常规陈述 **`-2% ~ +1%`**，现场反问与例证列举 **`+2% ~ +4%`**。
    - **Host A 明亮度与活力校准**：统一在 `content/podcast/voices.ts` 中配置 Host A 林舟的 Edge TTS `edgePitch = '+5Hz'`，Fish Audio `fishRateOffset = +2`、`fishDefaultToneTag = '[pitch up] [confident]'`、`fishTemperature = 0.82`，确保男声在保持叙事厚度的同时明朗昂扬、富有对话张力；当单句显式标注 `[cue:whisper]` / `[cue:soft]` / `[cue:sigh]` / `[cue:serious]` / `[cue:calm]` 时，引擎自动尊重该低能量情绪标签，不叠加默认高昂基调。
    - **Host B 基准配置**：苏晴保持 `edgePitch = '+0Hz'`、`fishRateOffset = 0`、`fishTemperature = 0.8`，以自然清亮的女声质感与主讲形成声部互补。
 3. **克制型口语连接与情绪留白**：在真实思路顿挫、恍然、反讽或追问起手处配合自然连接词与 `[cue:*]` 音频标签，全篇每 3–4 句点缀一处精准情绪或副语言提示，增强声音起伏而不流于夸张。
+4. **中文口播自然化与去夸张修辞**：
+   - 避免“破圈”“振聋发聩”“摄人心魄”“一锤定音”“太扎心了”“笑死人”“掀开底牌”“堪称经典”“把……演绝了”等过度用力的自媒体/AI式夸张词，改用平实自然的引述语（如“原话是这么说的”“书中说”“由此能看到”）。
+   - 拆开多层前置长定语，用符合中文说话习惯的短句表达深层逻辑；优先选用自然生活词，学术英文概念一律译为中文口播，避免冗长英文单词混读割裂 TTS 韵律。
 
 ---
 
@@ -93,7 +96,7 @@
 - **接口端点**：`POST https://api.fish.audio/v1/tts`
 - **鉴权**：Header 传入 `Authorization: Bearer $FISH_API_KEY` 与 `model: s2.1-pro-free`（密钥仅用于本地离线合成脚本 `pipelines/podcast/generate.ts`）。
 - **声线绑定（统一定义于 `content/podcast/voices.ts`）**：
-  - 林舟（Host A）：`7bbcf02c0398403fa3048aa9917c7a5f`（*主讲男声* · `fishRateOffset: +2` · `fishDefaultToneTag: '[pitch up] [confident]'` · `temperature: 0.82` · `top_p: 0.8`）
+  - 林舟（Host A）：`ec48458814e3409196c795a3a6b32201`（*主讲男声* · `fishRateOffset: +2` · `fishDefaultToneTag: '[pitch up] [confident]'` · `temperature: 0.82` · `top_p: 0.8`）
   - 苏晴（Host B）：`048222d36be842f199ec8ac71993dce4`（*金* · 柔和知性女声 · `fishRateOffset: 0` · `temperature: 0.8` · `top_p: 0.8`）
 - **请求参数**：
   ```json
@@ -114,7 +117,8 @@
 
 ### 4.3 后期母带与时间戳标准（`ffmpeg` / `ffprobe`）
 1. 所有语音与静音切片统一解码为 `24000Hz / 单声道 / pcm_s16le` WAV，逐段由 `ffprobe` 读取精确时长，累加生成与音频帧完全对齐的 `*.timings.json`（供工作台播放器高亮同步与点击跳转）。
-2. 全片通过 `ffmpeg concat` 拼接后执行广播级响度标准化：
+2. 拼接前自动检测 Host A 与 Host B 语音切片的平均响度差（`volumedetect`），若差值超过 `1.0 dB`，自动对 Host A 语音切片做平滑增益对齐，避免不同音色原始电平差异导致对话忽大忽小。
+3. 全片通过 `ffmpeg concat` 拼接后执行广播级响度标准化：
    - `-af "loudnorm=I=-16:TP=-1.5:LRA=11"`
    - 导出 `128kbps / 24kHz / mono` MP3，经临时文件原子写入 `artifacts/<slug>/podcast/<provider>.mp3`，并同步输出 `artifacts/<slug>/podcast/<provider>.timings.json`。
 

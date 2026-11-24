@@ -1,9 +1,13 @@
 import type { PodcastEpisode } from './types';
 import { AMUSING_FULL_PODCAST } from './episodes/amusing';
+import { XIANGTU_FULL_PODCAST } from './episodes/xiangtuZhongguo';
 
-export { AMUSING_FULL_PODCAST };
+export { AMUSING_FULL_PODCAST, XIANGTU_FULL_PODCAST };
 
-export const PODCAST_EPISODES: PodcastEpisode[] = [AMUSING_FULL_PODCAST];
+export const PODCAST_EPISODES: PodcastEpisode[] = [
+  AMUSING_FULL_PODCAST,
+  XIANGTU_FULL_PODCAST,
+];
 
 export const PODCAST_EPISODES_BY_BOOK: Record<string, PodcastEpisode> = Object.fromEntries(
   PODCAST_EPISODES.map((ep) => [ep.bookSlug, ep])

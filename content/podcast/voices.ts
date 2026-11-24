@@ -9,7 +9,7 @@ export const CANONICAL_VOICE_CONFIG = {
     name: '林舟',
     edgeVoice: 'zh-CN-YunjianNeural',
     edgePitch: '+5Hz',
-    fishReferenceId: '7bbcf02c0398403fa3048aa9917c7a5f',
+    fishReferenceId: 'ec48458814e3409196c795a3a6b32201',
     fishVoiceTitle: '主讲男声',
     fishRateOffset: 2,
     fishDefaultToneTag: '[pitch up] [confident]',

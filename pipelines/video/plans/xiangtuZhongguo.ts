@@ -1,0 +1,447 @@
+import type { BookVideoPlan } from '../types';
+
+export const XIANGTU_VIDEO_PLAN: BookVideoPlan = {
+  bookSlug: 'xiangtu-zhongguo',
+  scenes: [
+    // ==================== ACT 1 ====================
+    {
+      sceneId: 'scene-01',
+      actId: 'act-1',
+      startSegmentId: 'seg-01',
+      endSegmentId: 'seg-01',
+      layout: 'ppt-cover',
+      motion: 'static',
+      imageFile: 'scene-01.png',
+      imagePrompt:
+        'A flagship hand-drawn editorial magazine cover PPT slide for Fei Xiaotong’s classic sociology book. Top-left small vermilion marker badge: "全书视觉精读 · 1947 / 1984". Large bold expressive brush-and-crayon hand-lettered Chinese main title: "乡土中国" with a vivid red crayon underline. Crisp hand-lettered Chinese subtitle directly below: "从泥土长出的水波秩序，与它撞上现代之后的阵痛". Main editorial artwork spanning the center-right: a poetic Chinese village with whitewashed walls and a gnarled scholar tree whose deep roots grip ochre earth, feeding concentric cobalt and vermilion water ripples spreading outward, while a sleek modern train and faint city skyline emerge on the far horizon. Clean hand-lettered author credit: "费孝通 · 社会学经典 · 全书深读". Keep generous pure-white breathing space across the bottom 18% strip.',
+      overlay: {
+        chapterTag: '全书视觉精读 · 1947 / 1984',
+        headline: '乡土中国',
+        subtitleText: '从泥土长出的水波秩序，与它撞上现代之后的阵痛',
+        quoteZh:
+          '中国传统基层社会的全部制度、道德与变迁困境，都生长在“靠土地安土重迁、世代在熟人社群里共同生活”的地基上。',
+        quoteSource: '费孝通 · 社会学经典 · 全书深读',
+      },
+    },
+    {
+      sceneId: 'scene-02',
+      actId: 'act-1',
+      startSegmentId: 'seg-02',
+      endSegmentId: 'seg-04',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-02.png',
+      imagePrompt:
+        'A two-part editorial concept PPT slide explaining Fei Xiaotong’s 1984 preface. Top hand-lettered Chinese title: "不是农村素描，而是“理想型”". Left side framed in a dashed cobalt crayon box showing coastal trade ships and busy southern market streets, Chinese callout: "沿海商贸与圩市（保留边界）". Right side drawn with bold vermilion and black marker showing an architectural X-ray blueprint scaffold of a pure rural village model, Chinese callout: "1984重刊序言 · 理论脚手架".',
+      overlay: {
+        chapterTag: '第一幕 · 1984 重刊序言',
+        headline: '不是农村素描，而是提纯出的“理想型”框架',
+      },
+    },
+    {
+      sceneId: 'scene-03',
+      actId: 'act-1',
+      startSegmentId: 'seg-05',
+      endSegmentId: 'seg-06',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-03.png',
+      imagePrompt:
+        'A witty split-panel adult editorial cartoon PPT slide contrasting city and rural knowledge. Top hand-lettered Chinese title: "谁才是“笨蛋”？". Left panel: a 1940s car honking with jagged red sound lines while a stubborn rural old man turns around scolding the car and the startled driver yells, Chinese label: "进城不躲喇叭". Right panel: a bespectacled city schoolgirl pointing at tall corn stalks calling them wheat while a village grandma chuckles behind her hand, Chinese label: "下乡包谷喊麦子". Bottom marker summary with red underline: "不是脑子笨，是生存经验不同".',
+      overlay: {
+        chapterTag: '第一幕 · 乡土本色',
+        headline: '城里人按喇叭，女学生把包谷喊成麦子',
+      },
+    },
+    {
+      sceneId: 'scene-04',
+      actId: 'act-1',
+      startSegmentId: 'seg-07',
+      endSegmentId: 'seg-08',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-04.png',
+      imagePrompt:
+        'A clean split visual-essay PPT slide contrasting two social foundations. Top hand-lettered Chinese title: "生根于土：礼俗社会 vs 法理社会". Left side in warm ochre, forest green, and vermilion crayon: villagers standing beside an old village tree with deep roots growing straight from their feet into the soil, Chinese callout: "礼俗社会 · 一起生长 · 熟人默契". Right side in crisp cobalt blue and slate marker: modern office towers, briefcases, gears, and signed contract sheets, Chinese callout: "法理社会 · 签合同办事 · 陌生人分工".',
+      overlay: {
+        chapterTag: '第一幕 · 两种社会',
+        headline: '像植物一样生根：礼俗社会与法理社会',
+      },
+    },
+
+    // ==================== ACT 2 ====================
+    {
+      sceneId: 'scene-05',
+      actId: 'act-2',
+      startSegmentId: 'seg-09',
+      endSegmentId: 'seg-11',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-05.png',
+      imagePrompt:
+        'A lively editorial storytelling PPT slide about face-to-face rural communication. Top hand-lettered Chinese title: "敲门只喊“我”：为何不用文字？". Left illustration: a wooden courtyard door with a neighbor knocking outside shouting one giant bold vermilion hand-lettered character "我！", while the villager inside smiles instantly recognizing the voice and footsteps. Right minimalist diagram: a distant megaphone and a folded letter linked by a red arrow, Chinese callouts: "面对面社群：声调表情全在场" and "文字 = 不在场时的传声筒".',
+      overlay: {
+        chapterTag: '第二幕 · 文字下乡',
+        headline: '敲门只喊“我”：文字是不在场时的传声筒',
+      },
+    },
+    {
+      sceneId: 'scene-06',
+      actId: 'act-2',
+      startSegmentId: 'seg-12',
+      endSegmentId: 'seg-12',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-06.png',
+      imagePrompt:
+        'A sharp conceptual editorial PPT slide contrasting insider lingo with standard writing. Top hand-lettered Chinese title: "行话传情，书面语像筛子". Upper vignette in warm mustard and orange crayon: an elderly couple exchanging a knowing glance and two tiny speech bubbles across a wooden window ("行话：心领神会"). Lower visual metaphor in cobalt blue marker: rigid square text blocks passing through a coarse mesh sieve with glowing warm dots slipping through the holes ("标准书面语：漏掉微妙情意"). Corner arrow note: "工具先不先进，看时空距离".',
+      overlay: {
+        chapterTag: '第二幕 · 行话与书面语',
+        headline: '熟人行话传情，标准文字有时反而像筛子',
+      },
+    },
+    {
+      sceneId: 'scene-07',
+      actId: 'act-2',
+      startSegmentId: 'seg-13',
+      endSegmentId: 'seg-15',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-07.png',
+      imagePrompt:
+        'A three-vignette editorial infographic PPT slide on memory and repetition. Top hand-lettered Chinese title: "天天“同上”：记忆就是档案馆". Top-left sketch: a professor’s daughter clutching thick books while a tiny green grasshopper leaps past her hands ("脱离生活：间接经验"). Top-right sketch: an open diary page with one line at the top followed by bold repeating red Chinese characters "同上 / 同上 / 同上". Bottom visual: an old village scholar tree intertwined with floating memory cards labeled "生活不变，个人记忆就是档案馆".',
+      overlay: {
+        chapterTag: '第二幕 · 再论文字下乡',
+        headline: '捉不到蚱蜢、“同上”日记与记忆档案馆',
+      },
+    },
+
+    // ==================== ACT 3 ====================
+    {
+      sceneId: 'scene-08',
+      actId: 'act-3',
+      startSegmentId: 'seg-16',
+      endSegmentId: 'seg-17',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-08.png',
+      imagePrompt:
+        'A biting architectural cutaway cartoon PPT slide showing the public-morality paradox. Top hand-lettered Chinese title: "自家擦得锃亮，公厕没人扫？". Left interior of a Suzhou courtyard house glowing cleanly with warm yellow crayon where family brothers dine loyally ("门内：极讲义气"). Right exterior beyond the back door painted in muddy grey and green crayon showing dirty water dumped into a canal and an untidy shared courtyard toilet ("门外：公共空间无人管"). Bottom red marker question: "不在人心坏，在结构格局不同".',
+      overlay: {
+        chapterTag: '第三幕 · 公德之谜',
+        headline: '苏州后门小河与没人扫的合院公厕',
+      },
+    },
+    {
+      sceneId: 'scene-09',
+      actId: 'act-3',
+      startSegmentId: 'seg-18',
+      endSegmentId: 'seg-19',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-09.png',
+      imagePrompt:
+        'The iconic side-by-side sociological diagram PPT slide of the whole book. Top hand-lettered Chinese title: "团体格局（柴捆）vs 差序格局（水波）". Left side in bold cobalt and ochre crayon: neatly tied bundles of firewood with strict rope boundaries, Chinese callout: "西洋团体格局：边界分明". Right side in expressive vermilion, cobalt, and mustard crayon: concentric ripples spreading outward from a stone dropped in water with a bold black center character "己" and ring labels "家 → 族 → 天下", Chinese callout: "中国差序格局：水波同心圆".',
+      overlay: {
+        chapterTag: '第三幕 · 差序格局',
+        headline: '一捆捆扎清楚的柴 vs 水面推出去的同心波纹',
+      },
+    },
+    {
+      sceneId: 'scene-10',
+      actId: 'act-3',
+      startSegmentId: 'seg-20',
+      endSegmentId: 'seg-21',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-10.png',
+      imagePrompt:
+        'An editorial framework PPT slide unpacking public-private elasticity and Renlun. Top hand-lettered Chinese title: "公私伸缩与“伦”的本意". Upper visual: a stretchy red elastic band expanding and shrinking around "己 · 家 · 族" beside a tipped scale labeled "格雷欣公律：谁护公谁吃亏". Lower left box: "西洋个人主义：制度划清边界" vs lower right box: "差序自我主义：只靠向内克己", with a wave-icon note reading "伦 = 水波的次序".',
+      overlay: {
+        chapterTag: '第三幕 · 自我主义与人伦',
+        headline: '格雷欣公律、自我主义与“伦”的水波本意',
+      },
+    },
+    {
+      sceneId: 'scene-11',
+      actId: 'act-3',
+      startSegmentId: 'seg-22',
+      endSegmentId: 'seg-23',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-11.png',
+      imagePrompt:
+        'A dramatic two-part editorial storytelling PPT slide on personal morality. Top hand-lettered Chinese title: "维系着私人的道德". Left diagram: a personal web radiating from "己" to distinct nodes tagged "父·孝", "友·信", "君·忠" ("孔子因人指点，没有抽象公理"). Right illustration: ancient Emperor Shun tossing away his golden imperial seal on the ground while carrying his elderly father on his back toward a blue ocean shore, bold vermilion Chinese callout: "大舜背父逃海滨：宁舍天下，不毁近伦".',
+      overlay: {
+        chapterTag: '第三幕 · 维系私人的道德',
+        headline: '道德系在私人网上：孔子论仁与大舜背父逃海滨',
+      },
+    },
+
+    // ==================== ACT 4 ====================
+    {
+      sceneId: 'scene-12',
+      actId: 'act-4',
+      startSegmentId: 'seg-24',
+      endSegmentId: 'seg-26',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-12.png',
+      imagePrompt:
+        'A crisp comparison infographic PPT slide contrasting family structures. Top hand-lettered Chinese title: "四口之家 ≠ 西洋核心家庭". Left sketch in cool blue crayon: parents waving goodbye as grown children walk away from a small temporary tent-like house labeled "西洋家庭：临时生育站". Right sketch in warm ochre and vermilion crayon: four figures (grandparents, son, daughter-in-law) under a sturdy timber courtyard roof stamped with four hanging plaques "种地 · 祭祖 · 养老 · 传代", labeled "乡土小家族：长期事业社群".',
+      overlay: {
+        chapterTag: '第四幕 · 家族',
+        headline: '人数少只是土地所限：乡土“小家族”是长期事业公司',
+      },
+    },
+    {
+      sceneId: 'scene-13',
+      actId: 'act-4',
+      startSegmentId: 'seg-27',
+      endSegmentId: 'seg-28',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-13.png',
+      imagePrompt:
+        'An architectural force-diagram PPT slide on vertical versus horizontal family axes. Top hand-lettered Chinese title: "主轴是纵的，不是横的". Center diagram: a massive bold vermilion vertical pillar linking "父子 · 婆媳 · 世代延续" ("纵轴：纪律与传承"), crossed by a thin pale dashed horizontal line between husband and wife ("横轴：压低亲密 · 称呼“屋里的”"). Small corner silhouettes of men chatting at a village teahouse and women conversing by a stone well.',
+      overlay: {
+        chapterTag: '第四幕 · 纵轴与横轴',
+        headline: '父子婆媳为纵轴，夫妻之间刻意保持克制',
+      },
+    },
+    {
+      sceneId: 'scene-14',
+      actId: 'act-4',
+      startSegmentId: 'seg-29',
+      endSegmentId: 'seg-30',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-14.png',
+      imagePrompt:
+        'A refined cultural-comparison PPT slide on gender separation and stability. Top hand-lettered Chinese title: "男女有别：靠“了解”而非激情". Left side in stormy orange and violet crayon: dramatic sparks and swirling passion representing restless romance ("浮士德式：以冲突与爱情为生命"). Right side in calm forest green and mustard crayon: steady same-gender village work groups moving in silent harmony ("阿波罗式：求稳态 · 靠默契了解"). Bottom-right dashed reflection note: "辩证思考：女性的情感压抑与话语不对等".',
+      overlay: {
+        chapterTag: '第四幕 · 男女有别',
+        headline: '稳定靠了解而非感情，兼看性别视角留白',
+      },
+    },
+
+    // ==================== ACT 5 ====================
+    {
+      sceneId: 'scene-15',
+      actId: 'act-5',
+      startSegmentId: 'seg-31',
+      endSegmentId: 'seg-32',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-15.png',
+      imagePrompt:
+        'A charming satirical editorial illustration PPT slide of Fei Xiaotong’s Kunming landlady. Top hand-lettered Chinese title: "咸菜擦假牙：不是人治，是旧习惯". Center illustration: a kind elderly Chinese landlady wearing round glasses carefully scrubbing a shiny new American false-teeth denture with pickled vegetables and a rough indigo blue cloth beside a saltwater bowl, labeled "昆明房东：蓝青布与咸菜擦美国假牙". Upper-left crossed-out red stamp: "拍脑袋的人治？".',
+      overlay: {
+        chapterTag: '第五幕 · 礼治秩序',
+        headline: '昆明房东老太太：拿咸菜和蓝青布擦美国假牙',
+      },
+    },
+    {
+      sceneId: 'scene-16',
+      actId: 'act-5',
+      startSegmentId: 'seg-33',
+      endSegmentId: 'seg-34',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-16.png',
+      imagePrompt:
+        'A balanced conceptual infographic PPT slide on the double-edged sword of Ritual Governance. Top hand-lettered Chinese title: "礼治的双刃剑：合式与变局". Top banner in bold black ink: "礼 = 社会公认合式的行为规范". Left side in calm green crayon: a peaceful village with zero police needed, Chinese callout: "环境不变：省力如呼吸". Right side in sharp vermilion crayon: a fast modern train rushing past an old wooden cart stuck in deep ruts, Chinese callout: "时代剧变：死守老礼闹笑话".',
+      overlay: {
+        chapterTag: '第五幕 · 礼的含义',
+        headline: '礼是公认合式的规范：环境不变极省力，剧变则失灵',
+      },
+    },
+    {
+      sceneId: 'scene-17',
+      actId: 'act-5',
+      startSegmentId: 'seg-35',
+      endSegmentId: 'seg-36',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-17.png',
+      imagePrompt:
+        'A vivid theatrical courtroom-mediation cartoon PPT slide set in a rural township office. Top hand-lettered Chinese title: "乡公所审烟案：良心胜过法条". Center sketch: a dignified village elder in a traditional gown lecturing three sheepish family members in turn—first scolding the old father, then the elder brother, then ordering the younger brother to quit opium—while a thick law book gathers dust and the uniformed government Baozhang sits completely silent on the side. Bold red callout: "维持礼俗的力量不在身外权力，而在身内良心".',
+      overlay: {
+        chapterTag: '第五幕 · 无讼现场',
+        headline: '乡公所调解大烟纠纷：乡绅训教化，保长一言未发',
+      },
+    },
+    {
+      sceneId: 'scene-18',
+      actId: 'act-5',
+      startSegmentId: 'seg-37',
+      endSegmentId: 'seg-38',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-18.png',
+      imagePrompt:
+        'A sharp satirical contrast PPT slide about parachuting modern courts into rural villages. Top hand-lettered Chinese title: "无讼：司法直接下乡为何适得其反？". Left vignette: a soccer match with a referee blowing a whistle ("法治：球场争输赢"). Right main scene: a modern judge gavel dropping by parachute onto a tight-knit village while a sly troublemaker smirks clutching a legal writ to extort an honest farmer. Bold red-underlined Chinese warning: "法治好处未得，礼治弊病先发".',
+      overlay: {
+        chapterTag: '第五幕 · 送法下乡的警示',
+        headline: '打官司等于承认不懂规矩：旧良心先碎，真法治未立',
+      },
+    },
+
+    // ==================== ACT 6 ====================
+    {
+      sceneId: 'scene-19',
+      actId: 'act-6',
+      startSegmentId: 'seg-39',
+      endSegmentId: 'seg-40',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-19.png',
+      imagePrompt:
+        'A witty political-economy infographic PPT slide about Guangxi Dayao Mountain. Top hand-lettered Chinese title: "皇权为何无为？先算一笔经济账". Center sketch: steep rocky mountain terraced plots yielding only one small bowl of rice ("广西大瑶山：山地贫瘠，仅够糊口"), next to an abacus showing a red minus sign where a tax overseer’s own rice bowl costs more than the harvest ("派监工收租入不敷出"). Small crossed-out halo label: "并非圣王仁政".',
+      overlay: {
+        chapterTag: '第六幕 · 无为政治',
+        headline: '不是圣王仁政，是广西大瑶山的农业剩余算术',
+      },
+    },
+    {
+      sceneId: 'scene-20',
+      actId: 'act-6',
+      startSegmentId: 'seg-41',
+      endSegmentId: 'seg-41',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-20.png',
+      imagePrompt:
+        'A bold historical dynamics PPT slide contrasting coercive and consensual power. Top hand-lettered Chinese title: "横暴权力碰壁 vs 基层同意权力". Upper half in intense vermilion and charcoal crayon: imperial forced labor building the Great Wall snapping a thin peasant grain stalk, triggering rebel torches ("修长城加重税 → 逼出陈胜吴广"). Lower half divided by a calm horizontal county-wall line ("皇权止于县衙"): peaceful rural villagers sharing irrigation water by mutual cooperation ("基层：同意权力自行过日子").',
+      overlay: {
+        chapterTag: '第六幕 · 横暴与同意权力',
+        headline: '强权硬压必翻船，皇权停在县衙之上最划算',
+      },
+    },
+    {
+      sceneId: 'scene-21',
+      actId: 'act-6',
+      startSegmentId: 'seg-42',
+      endSegmentId: 'seg-44',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-21.png',
+      imagePrompt:
+        'An editorial power-triangle diagram PPT slide introducing Paternalistic / Cultural Power. Top hand-lettered Chinese title: "长老统治：第三种“教化权力”". Center triangle diagram with three crayon-colored corners: "横暴权力（冲突）", "同意权力（合作）", and a large highlighted vermilion apex "教化权力（文化传承）" showing an elder passing a glowing traditional lantern down a stone bridge to a youth ("三年无改于父之道"). Bottom warning crack: "前提：生活不变；一旦剧变，权威崩塌".',
+      overlay: {
+        chapterTag: '第六幕 · 长老统治',
+        headline: '非专制非选举：替不变传统代言的“教化权力”',
+      },
+    },
+    {
+      sceneId: 'scene-22',
+      actId: 'act-6',
+      startSegmentId: 'seg-45',
+      endSegmentId: 'seg-47',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-22.png',
+      imagePrompt:
+        'A rich field-research infographic PPT slide on Bloodline versus Geography and Commerce. Top hand-lettered Chinese title: "血缘伤感情，买卖找“新客”". Three lively vignettes arranged left to right: 1) Yunnan villagers pooling coins in a credit circle with friends while politely waving away relatives ("钱会：拉朋友不拉亲戚"); 2) an open-air 5-day periodic fair trading silver and goods on the spot ("五日街集：银货两讫"); 3) an outsider general store with a hanging lantern reading "江夏费" ("外来新客：血缘隔离墙"). Bold bottom flow arrow: "血缘（身份社会）→ 地缘（契约社会）".',
+      overlay: {
+        chapterTag: '第六幕 · 血缘与地缘',
+        headline: '钱会、五日街集与外来“新客”：契约从血缘裂缝长出',
+      },
+    },
+
+    // ==================== ACT 7 ====================
+    {
+      sceneId: 'scene-23',
+      actId: 'act-7',
+      startSegmentId: 'seg-48',
+      endSegmentId: 'seg-49',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-23.png',
+      imagePrompt:
+        'A wry transitional-era editorial cartoon PPT slide depicting the county magistrate’s bitter smile. Top hand-lettered Chinese title: "县长的苦笑与“时势权力”". Center illustration: a bewildered 1940s county magistrate holding his forehead over a modern court indictment filed by a village rogue against an affair rival ("败类借现代诉讼搅穿旧礼治"), while industrial trains and new schools enter the village gates in the background. Right-side callout badge in bright orange marker: "第四种权力：时势权力（剧变中的领路人）".',
+      overlay: {
+        chapterTag: '第七幕 · 名实的分离',
+        headline: '县长的苦笑案，与社会剧变催生的“时势权力”',
+      },
+    },
+    {
+      sceneId: 'scene-24',
+      actId: 'act-7',
+      startSegmentId: 'seg-50',
+      endSegmentId: 'seg-50',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-24.png',
+      imagePrompt:
+        'A sharp satirical metaphor PPT slide on Nominal vs Real separation. Top hand-lettered Chinese title: "名实分离：靠“注释”保面子". Center visual: an old traditional wooden ledger and elder’s staff wearing a shiny modern jacket tagged "议会 · 自治 · 现代头衔", while underneath the lifted hem old favor-trading hands shake secretly. Bold red marker callout box: "不改真实利益与考核，新名词就会被“重新注释”架空".',
+      overlay: {
+        chapterTag: '第七幕 · 习惯惰性与注释戏法',
+        headline: '嘴上全是新名词，底下照旧按老逻辑运转',
+      },
+    },
+    {
+      sceneId: 'scene-25',
+      actId: 'act-7',
+      startSegmentId: 'seg-51',
+      endSegmentId: 'seg-52',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-25.png',
+      imagePrompt:
+        'A clever editorial comparison PPT slide from Desire to Need and Planning. Top hand-lettered Chinese title: "从“欲望”到“需要”与计划". Left side in vivid red and warm ochre crayon: Yunnan villagers eating bright red chili peppers and garlic in winter snow ("吃辣子大蒜：欲望是文化事实"). Right side in crisp cobalt blue and green marker: a modern nutrition chart highlighting vitamins and a balanced scientific blueprint ("现代快车道：光凭嘴馋会缺维他命"). Bottom bold arrow: "顺从欲望 → 科学核算需要 → 理性计划".',
+      overlay: {
+        chapterTag: '第七幕 · 从欲望到需要',
+        headline: '欲望是文化编码：现代社会必须转向科学的“需要”与计划',
+      },
+    },
+    {
+      sceneId: 'scene-26',
+      actId: 'act-7',
+      startSegmentId: 'seg-53',
+      endSegmentId: 'seg-54',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-26.png',
+      imagePrompt:
+        'A warm, respectful dual-timeline editorial PPT slide honoring Fei Xiaotong’s academic honesty. Top hand-lettered Chinese title: "1947 后记 & 1993 晚年自省". Left panel (1947 Tsinghua): rejecting sliced-up textbook boxes ("经济/政治/家庭") in favor of a living rooted community map ("研究活生生的具体社区"). Right panel (1993, age 83): a wise elderly scholar gently drawing a glowing human figure back into the center of a vast structural blueprint, warm vermilion callout: "坦承早年“见社会不见人” · 找回个体的尊严与痛感".',
+      overlay: {
+        chapterTag: '第七幕 · 后记与附录',
+        headline: '1947 社区研究锚石，与 1993 八十三岁的坦率自省',
+      },
+    },
+    {
+      sceneId: 'scene-27',
+      actId: 'act-7',
+      startSegmentId: 'seg-55',
+      endSegmentId: 'seg-56',
+      layout: 'ppt-slide',
+      motion: 'static',
+      imageFile: 'scene-27.png',
+      imagePrompt:
+        'A crisp contemporary reflection PPT slide bridging 1947 to today’s China. Top hand-lettered Chinese title: "当代回看：两处边界与田野眼光". Left card: southern coastal commercial clans & high-speed rail urbanization uprooting immobility ("边界：华南商帮采样局限 · 进城务工与流动时代"). Right card: a modern smartphone glowing with chat-group bubbles forming subtle concentric ripples ("业主微信群与职场：变形版差序格局"). Bottom marker takeaway: "不背1947定论，继承从日常追问结构的眼光".',
+      overlay: {
+        chapterTag: '第七幕 · 当代回看边界',
+        headline: '跨越采样与流动剧变：在微信群与职场里重读田野眼光',
+      },
+    },
+    {
+      sceneId: 'scene-28',
+      actId: 'act-7',
+      startSegmentId: 'seg-57',
+      endSegmentId: 'seg-58',
+      layout: 'ppt-closing',
+      motion: 'static',
+      imageFile: 'scene-28.png',
+      imagePrompt:
+        'A warm, memorable hand-drawn closing keynote PPT slide wrapping up Fei Xiaotong’s From the Soil. Top bold hand-lettered Chinese headline with vermilion crayon underline: "理解泥土里的秩序，重新看见活生生的人". Center visual metaphor: concentric cobalt and mustard water ripples radiating from rooted earth, with a glowing warm golden-crayon human silhouette standing upright at the very heart of the structural web. Beside the illustration, two crisp hand-lettered Chinese takeaway callouts with sketchy red bullet strokes: "脱离乡土地基空降条款，先拆旧约束却接不住新根" and "走向现代的理性计划，最终必须重新看见“人”". Subtle hand-lettered footer credit above the white bottom margin: "费孝通《乡土中国》 · 全书深读完结". Keep generous pure-white breathing space across the bottom 18% strip.',
+      overlay: {
+        chapterTag: '全书终极命题 · 完结',
+        headline: '理解泥土里的秩序，重新看见活生生的人',
+        quoteZh:
+          '任何脱离乡土地基、直接空降现代契约与法治条款的做法，都会先拆毁旧约束却接不住新秩序的根；而走向现代的理性计划，最终也必须重新看见活生生的“人”。',
+        quoteSource: '费孝通《乡土中国》 · 1947 / 1984 / 1993 · 全书深读',
+      },
+    },
+  ],
+};

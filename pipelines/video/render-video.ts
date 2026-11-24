@@ -285,7 +285,7 @@ function buildSlideAssContent(
   const pillH = Math.round(62 * scale);
   const padX = Math.round(64 * scale);
   const radius = Math.round(13 * scale);
-  const centerY = Math.round(height - 54 * scale);
+  const centerY = Math.round(height - 96 * scale);
   const pillY = Math.round(centerY - pillH / 2);
   const centerX = Math.round(width / 2);
 
@@ -485,7 +485,7 @@ async function main() {
       .createHash('sha256')
       .update(
         JSON.stringify({
-          v: 5,
+          v: 6,
           scene,
           index: i,
           total: storyboard.scenes.length,
@@ -633,7 +633,7 @@ async function main() {
         .createHash('sha256')
         .update(
           JSON.stringify({
-            v: 3,
+            v: 4,
             outWidth,
             outHeight,
             renderFps,

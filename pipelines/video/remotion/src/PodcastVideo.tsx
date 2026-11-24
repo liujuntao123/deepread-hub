@@ -122,7 +122,8 @@ export const PodcastVideo: React.FC<PodcastVideoProps> = ({
 
   const slideNumLabel = `${String(activeSceneIndex + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
   const layout = activeScene?.layout ?? 'ppt-slide';
-  const isDarkSlide = layout === 'ppt-closing' || layout === 'closing-card';
+  const hasSlideImage = Boolean(activeScene?.imageFile);
+  const isDarkSlide = !hasSlideImage && (layout === 'ppt-closing' || layout === 'closing-card');
 
   const fontFaceCss = assetBaseUrl
     ? `
@@ -150,7 +151,13 @@ export const PodcastVideo: React.FC<PodcastVideoProps> = ({
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: isDarkSlide ? '#171615' : layout === 'ppt-cover' ? '#FAF7F2' : '#FFFFFF',
+        backgroundColor: hasSlideImage
+          ? '#FFFFFF'
+          : isDarkSlide
+            ? '#171615'
+            : layout === 'ppt-cover'
+              ? '#FAF7F2'
+              : '#FFFFFF',
         color: isDarkSlide ? '#FAF8F5' : '#1C1917',
         fontFamily: FONT_SANS,
         position: 'relative',
@@ -170,7 +177,7 @@ export const PodcastVideo: React.FC<PodcastVideoProps> = ({
           flexDirection: 'column',
         }}
       >
-        {(layout === 'ppt-slide' || layout === 'editorial-illustration') && activeScene?.imageFile ? (
+        {hasSlideImage ? (
           <div
             style={{
               width: '100%',
@@ -180,7 +187,7 @@ export const PodcastVideo: React.FC<PodcastVideoProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '52px 52px 108px',
+              padding: '44px 52px 124px',
               boxSizing: 'border-box',
             }}
           >
@@ -521,7 +528,7 @@ export const PodcastVideo: React.FC<PodcastVideoProps> = ({
             position: 'absolute',
             left: 96,
             right: 96,
-            bottom: 34,
+            bottom: 65,
             display: 'flex',
             justifyContent: 'center',
             pointerEvents: 'none',

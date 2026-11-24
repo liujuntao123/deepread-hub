@@ -149,6 +149,57 @@ async function decodeToWav(inputPath: string, outputWavPath: string): Promise<vo
   ]);
 }
 
+async function measureMeanVolumeDb(
+  wavFiles: string[],
+  tempDir: string,
+  tag: string
+): Promise<number> {
+  if (wavFiles.length === 0) return -20;
+  const sample = wavFiles.slice(0, 12);
+  const listFile = path.join(tempDir, `vol-${tag}.txt`);
+  await fs.writeFile(
+    listFile,
+    sample.map((f) => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'),
+    'utf8'
+  );
+  const { stderr } = await execFileAsync(FFMPEG_BIN, [
+    '-f',
+    'concat',
+    '-safe',
+    '0',
+    '-i',
+    listFile,
+    '-af',
+    'volumedetect',
+    '-f',
+    'null',
+    '-',
+  ]);
+  const match = stderr.match(/mean_volume:\s*(-?\d+(?:\.\d+)?)\s*dB/);
+  return match ? Number.parseFloat(match[1]) : -20;
+}
+
+async function applyGainWav(
+  inputWavPath: string,
+  outputWavPath: string,
+  gainDb: number
+): Promise<void> {
+  await execFileAsync(FFMPEG_BIN, [
+    '-y',
+    '-i',
+    inputWavPath,
+    '-af',
+    `volume=${gainDb.toFixed(2)}dB`,
+    '-ar',
+    '24000',
+    '-ac',
+    '1',
+    '-c:a',
+    'pcm_s16le',
+    outputWavPath,
+  ]);
+}
+
 async function createSilenceWav(durationMs: number, outputWavPath: string): Promise<void> {
   const sec = Math.max(0.05, durationMs / 1000).toFixed(3);
   await execFileAsync(FFMPEG_BIN, [
@@ -321,10 +372,15 @@ export async function synthesizePodcastEpisode(
     let cacheHits = 0;
     let cacheMisses = 0;
 
+    interface BuiltSegmentChunk {
+      kind: 'speech' | 'silence';
+      wavPath: string;
+    }
+
     interface BuiltSegmentArtifact {
       segmentId: string;
       hostId: 'A' | 'B';
-      wavPaths: string[];
+      chunks: BuiltSegmentChunk[];
       speechDurationSec: number;
       gapWavPath: string | null;
       gapDurationSec: number;
@@ -341,7 +397,7 @@ export async function synthesizePodcastEpisode(
             : toFishAudioChunks(seg.scriptText, host.fishDefaultToneTag);
 
         const segPrefix = String(idx + 1).padStart(3, '0');
-        const wavPaths: string[] = [];
+        const builtChunks: BuiltSegmentChunk[] = [];
         let speechDurationSec = 0;
 
         for (let cIdx = 0; cIdx < chunks.length; cIdx += 1) {
@@ -402,7 +458,10 @@ export async function synthesizePodcastEpisode(
           }
 
           const dur = await probeDurationSeconds(wavPath);
-          wavPaths.push(wavPath);
+          builtChunks.push({
+            kind: chunk.kind === 'silence' ? 'silence' : 'speech',
+            wavPath,
+          });
           speechDurationSec += dur;
         }
 
@@ -421,7 +480,7 @@ export async function synthesizePodcastEpisode(
         return {
           segmentId: seg.id,
           hostId: seg.hostId,
-          wavPaths,
+          chunks: builtChunks,
           speechDurationSec,
           gapWavPath,
           gapDurationSec,
@@ -432,6 +491,39 @@ export async function synthesizePodcastEpisode(
     onProgress?.(
       `[${provider}] Chunk cache summary: ${cacheHits} hit(s), ${cacheMisses} synthesized${useCache ? '' : ' (cache disabled)'}`
     );
+
+    // Balance average vocal loudness between Host A and Host B before master loudnorm
+    const hostASpeechChunks = segmentArtifacts
+      .filter((a) => a.hostId === 'A')
+      .flatMap((a) => a.chunks.filter((c) => c.kind === 'speech'));
+    const hostBSpeechChunks = segmentArtifacts
+      .filter((a) => a.hostId === 'B')
+      .flatMap((a) => a.chunks.filter((c) => c.kind === 'speech'));
+
+    if (hostASpeechChunks.length > 0 && hostBSpeechChunks.length > 0) {
+      const meanA = await measureMeanVolumeDb(
+        hostASpeechChunks.map((c) => c.wavPath),
+        tempDir,
+        'hostA'
+      );
+      const meanB = await measureMeanVolumeDb(
+        hostBSpeechChunks.map((c) => c.wavPath),
+        tempDir,
+        'hostB'
+      );
+      const deltaDb = meanB - meanA;
+      if (Math.abs(deltaDb) > 1.0) {
+        const gainDb = Math.max(-10, Math.min(10, deltaDb));
+        onProgress?.(
+          `[${provider}] Balancing host loudness (Host A=${meanA} dB, Host B=${meanB} dB -> applying ${gainDb > 0 ? '+' : ''}${gainDb.toFixed(2)} dB to Host A)`
+        );
+        await mapWithConcurrency(hostASpeechChunks, 6, async (item, i) => {
+          const leveledPath = path.join(tempDir, `leveled-A-${i}.wav`);
+          await applyGainWav(item.wavPath, leveledPath, gainDb);
+          item.wavPath = leveledPath;
+        });
+      }
+    }
 
     const allWavPaths: string[] = [];
     const timings: SegmentTiming[] = [];
@@ -446,7 +538,7 @@ export async function synthesizePodcastEpisode(
     for (const artifact of segmentArtifacts) {
       const segStartSec = cursorSec;
       const segEndSec = segStartSec + artifact.speechDurationSec;
-      allWavPaths.push(...artifact.wavPaths);
+      allWavPaths.push(...artifact.chunks.map((c) => c.wavPath));
       cursorSec = segEndSec;
 
       timings.push({
