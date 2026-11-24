@@ -4,7 +4,6 @@ import {
   Audio,
   Img,
   interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
@@ -15,6 +14,10 @@ export interface VideoSceneData {
   startSec: number;
   endSec: number;
   layout:
+    | 'ppt-cover'
+    | 'ppt-slide'
+    | 'ppt-quote'
+    | 'ppt-closing'
     | 'act-title-card'
     | 'editorial-illustration'
     | 'quote-spotlight'
@@ -25,6 +28,7 @@ export interface VideoSceneData {
   overlay?: {
     chapterTag?: string;
     headline?: string;
+    subtitleText?: string;
     quoteZh?: string;
     quoteEn?: string;
     quoteSource?: string;
@@ -54,577 +58,515 @@ export interface PodcastVideoProps {
   width: number;
   height: number;
   totalDurationSec: number;
-  hosts: {
-    A: { name: string; role: string };
-    B: { name: string; role: string };
-  };
   acts: Array<{ id: string; indexLabel: string; title: string }>;
   scenes: VideoSceneData[];
   subtitles: SubtitleCue[];
+  /** When set, renders a single crisp still slide for fast FFmpeg assembly */
+  forceSceneIndex?: number;
+  /** When true, omits subtitle overlay so FFmpeg burns styled subtitles cleanly */
+  hideSubtitle?: boolean;
 }
 
 const FONT_SERIF =
-  '"Noto Serif CJK SC", "Source Han Serif SC", "WenQuanYi Zen Hei", "Songti SC", Georgia, serif';
+  '"DeepReadSerif", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif';
 const FONT_SANS =
-  '"Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Zen Hei", "WenQuanYi Micro Hei", sans-serif';
-const FONT_MONO = '"WenQuanYi Zen Hei Mono", "DejaVu Sans Mono", monospace';
-
-function formatTime(sec: number): string {
-  const safe = Math.max(0, Math.floor(sec));
-  const m = Math.floor(safe / 60);
-  const s = safe % 60;
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
-const VoiceWaveBars: React.FC<{ frame: number; active: boolean; color: string }> = ({
-  frame,
-  active,
-  color,
-}) => {
-  const heights = [0, 1, 2, 3, 4].map((i) => {
-    if (!active) return 4;
-    const wave = Math.abs(Math.sin(frame * 0.28 + i * 1.15));
-    return Math.round(6 + wave * 18);
-  });
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 24 }}>
-      {heights.map((h, idx) => (
-        <div
-          key={idx}
-          style={{
-            width: 3.5,
-            height: h,
-            borderRadius: 2,
-            backgroundColor: color,
-            opacity: active ? 0.95 : 0.28,
-          }}
-        />
-      ))}
-    </div>
-  );
-};
+  '"DeepReadSans", "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", sans-serif';
+const FONT_MONO = '"DejaVu Sans Mono", "Ubuntu Mono", monospace';
 
 export const PodcastVideo: React.FC<PodcastVideoProps> = ({
   bookTitle,
-  episodeTitle,
   audioUrl,
   assetBaseUrl,
   totalDurationSec,
-  hosts,
   acts,
   scenes,
   subtitles,
+  forceSceneIndex,
+  hideSubtitle = false,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const currentSec = frame / fps;
 
-  const activeScene =
-    scenes.find((s) => currentSec >= s.startSec && currentSec < s.endSec) ??
-    scenes[scenes.length - 1];
+  const isStillMode = typeof forceSceneIndex === 'number' || hideSubtitle;
+  const activeSceneIndex = typeof forceSceneIndex === 'number'
+    ? Math.max(0, Math.min(scenes.length - 1, forceSceneIndex))
+    : Math.max(
+        0,
+        scenes.findIndex((s) => frame / fps >= s.startSec && frame / fps < s.endSec)
+      );
 
-  const activeCue =
-    subtitles.find((c) => currentSec >= c.startSec && currentSec < c.endSec) ?? null;
+  const activeScene = scenes[activeSceneIndex] ?? scenes[scenes.length - 1];
+  const currentSec = isStillMode
+    ? (activeScene?.startSec ?? 0) + ((activeScene?.endSec ?? 1) - (activeScene?.startSec ?? 0)) * 0.5
+    : frame / fps;
+
+  const activeCue = hideSubtitle
+    ? null
+    : subtitles.find((c) => currentSec >= c.startSec && currentSec < c.endSec) ?? null;
 
   const activeAct =
-    acts.find((a) => a.id === (activeCue?.actId ?? activeScene?.actId)) ?? acts[0];
+    acts.find((a) => a.id === activeScene?.actId) ?? acts[0];
 
   const sceneStartFrame = activeScene ? Math.round(activeScene.startSec * fps) : 0;
-  const sceneEndFrame = activeScene ? Math.round(activeScene.endSec * fps) : 300;
-  const localFrame = Math.max(0, frame - sceneStartFrame);
-  const sceneLenFrames = Math.max(15, sceneEndFrame - sceneStartFrame);
+  const localFrame = isStillMode ? 30 : Math.max(0, frame - sceneStartFrame);
+  const fadeIn = isStillMode
+    ? 1
+    : interpolate(localFrame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
 
-  const fadeIn = interpolate(localFrame, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
-  const fadeOut = interpolate(
-    localFrame,
-    [Math.max(14, sceneLenFrames - 12), sceneLenFrames],
-    [1, 0],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-  );
-  const sceneOpacity = Math.min(fadeIn, fadeOut);
+  const totalSlides = Math.max(1, scenes.length);
+  const slideProgressRatio = isStillMode
+    ? (activeSceneIndex + 1) / totalSlides
+    : totalDurationSec > 0
+      ? Math.max(0, Math.min(1, currentSec / totalDurationSec))
+      : 0;
 
-  const entrance = spring({
-    frame: localFrame,
-    fps,
-    config: { damping: 20, stiffness: 120, mass: 0.9 },
-  });
-  const slideY = interpolate(entrance, [0, 1], [22, 0]);
+  const slideNumLabel = `${String(activeSceneIndex + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+  const layout = activeScene?.layout ?? 'ppt-slide';
+  const isDarkSlide = layout === 'ppt-closing' || layout === 'closing-card';
 
-  const progressRatio =
-    totalDurationSec > 0 ? Math.max(0, Math.min(1, currentSec / totalDurationSec)) : 0;
-
-  // Compute gentle Ken Burns transform for illustration scenes
-  const kenBurnsProgress = Math.min(1, localFrame / sceneLenFrames);
-  let imgTransform = 'scale(1)';
-  if (activeScene?.layout === 'editorial-illustration') {
-    if (activeScene.motion === 'zoom-in') {
-      const s = interpolate(kenBurnsProgress, [0, 1], [1.0, 1.07]);
-      imgTransform = `scale(${s.toFixed(4)})`;
-    } else if (activeScene.motion === 'zoom-out') {
-      const s = interpolate(kenBurnsProgress, [0, 1], [1.07, 1.0]);
-      imgTransform = `scale(${s.toFixed(4)})`;
-    } else if (activeScene.motion === 'pan-right') {
-      const x = interpolate(kenBurnsProgress, [0, 1], [-14, 14]);
-      imgTransform = `scale(1.05) translateX(${x.toFixed(2)}px)`;
-    } else if (activeScene.motion === 'pan-left') {
-      const x = interpolate(kenBurnsProgress, [0, 1], [14, -14]);
-      imgTransform = `scale(1.05) translateX(${x.toFixed(2)}px)`;
-    }
-  }
+  const fontFaceCss = assetBaseUrl
+    ? `
+      @font-face {
+        font-family: 'DeepReadSerif';
+        src: url('${assetBaseUrl}/__fonts/NotoSerifCJKsc-Bold.otf') format('opentype');
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'DeepReadSans';
+        src: url('${assetBaseUrl}/__fonts/NotoSansCJKsc-Medium.otf') format('opentype');
+        font-weight: 500;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'DeepReadSans';
+        src: url('${assetBaseUrl}/__fonts/NotoSansCJKsc-Bold.otf') format('opentype');
+        font-weight: 700;
+        font-style: normal;
+      }
+    `
+    : '';
 
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: '#FBF9F5',
-        color: '#1C1917',
+        backgroundColor: isDarkSlide ? '#171615' : layout === 'ppt-cover' ? '#FAF7F2' : '#FFFFFF',
+        color: isDarkSlide ? '#FAF8F5' : '#1C1917',
         fontFamily: FONT_SANS,
-        display: 'flex',
-        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {audioUrl ? <Audio src={audioUrl} /> : null}
+      {fontFaceCss ? <style>{fontFaceCss}</style> : null}
+      {audioUrl && !isStillMode ? <Audio src={audioUrl} /> : null}
 
-      {/* Top Editorial Header Strip */}
+      {/* Full-Canvas PPT Slide Stage */}
       <div
         style={{
-          height: 68,
-          padding: '0 64px',
+          position: 'absolute',
+          inset: 0,
+          opacity: fadeIn,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #E7E5E4',
-          backgroundColor: '#FBF9F5',
-          zIndex: 10,
+          flexDirection: 'column',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span
-            style={{
-              fontFamily: FONT_SERIF,
-              fontSize: 24,
-              fontWeight: 700,
-              color: '#1C1917',
-            }}
-          >
-            {bookTitle}
-          </span>
-          <span style={{ color: '#A8A29E', fontSize: 18 }}>|</span>
-          <span style={{ fontSize: 18, color: '#57534E', fontWeight: 500 }}>
-            {activeAct ? `${activeAct.indexLabel} · ${activeAct.title}` : episodeTitle}
-          </span>
-        </div>
-
-        <div
-          style={{
-            fontFamily: FONT_MONO,
-            fontSize: 18,
-            color: '#57534E',
-            letterSpacing: '0.03em',
-          }}
-        >
-          {formatTime(currentSec)} / {formatTime(totalDurationSec)}
-        </div>
-      </div>
-
-      {/* Main Visual Stage */}
-      <div
-        style={{
-          flex: 1,
-          position: 'relative',
-          padding: '28px 64px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-          opacity: sceneOpacity,
-        }}
-      >
-        {activeScene?.layout === 'editorial-illustration' && activeScene.imageFile ? (
+        {(layout === 'ppt-slide' || layout === 'editorial-illustration') && activeScene?.imageFile ? (
           <div
             style={{
               width: '100%',
               height: '100%',
+              backgroundColor: '#FFFFFF',
+              position: 'relative',
               display: 'flex',
-              flexDirection: 'column',
-              gap: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '52px 52px 108px',
+              boxSizing: 'border-box',
             }}
           >
-            {/* Compact Scene Caption Row */}
-            {(activeScene.overlay?.chapterTag || activeScene.overlay?.headline) && (
-              <div
+            {/* Whisper-minimal Editorial PPT Corner Meta (No clunky top bar!) */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 22,
+                left: 44,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                zIndex: 5,
+              }}
+            >
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'space-between',
-                  gap: 24,
-                  transform: `translateY(${slideY * 0.4}px)`,
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: '#E11D48',
+                  display: 'inline-block',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 17,
+                  fontWeight: 700,
+                  color: '#57534E',
+                  letterSpacing: '0.04em',
                 }}
               >
+                {activeScene.overlay?.chapterTag ?? activeAct?.title ?? bookTitle}
+              </span>
+            </div>
+
+            <div
+              style={{
+                position: 'absolute',
+                top: 22,
+                right: 44,
+                fontFamily: FONT_MONO,
+                fontSize: 16,
+                fontWeight: 600,
+                color: '#A8A29E',
+                letterSpacing: '0.08em',
+                zIndex: 5,
+              }}
+            >
+              {slideNumLabel}
+            </div>
+
+            {/* Seamless Full-Bleed Hand-Drawn PPT Illustration (Zero Heavy Frame Borders) */}
+            <Img
+              src={`${assetBaseUrl}/video/frames/${activeScene.imageFile}`}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+            />
+          </div>
+        ) : layout === 'ppt-cover' || layout === 'act-title-card' ? (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#FAF7F2',
+              position: 'relative',
+              padding: '88px 136px 136px',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Subtle Swiss Editorial Margin Hairlines */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 44,
+                left: 64,
+                right: 64,
+                height: 1,
+                backgroundColor: '#E7E0D6',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 20,
+                left: 64,
+                fontSize: 16,
+                fontWeight: 700,
+                color: '#78716C',
+                letterSpacing: '0.14em',
+              }}
+            >
+              DEEPREAD · 全书视觉精读
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 64,
+                fontFamily: FONT_MONO,
+                fontSize: 16,
+                color: '#A8A29E',
+                letterSpacing: '0.08em',
+              }}
+            >
+              {slideNumLabel}
+            </div>
+
+            {/* Giant Faint Editorial Watermark */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 110,
+                top: 100,
+                fontFamily: FONT_SERIF,
+                fontSize: 340,
+                fontWeight: 700,
+                lineHeight: 1,
+                color: '#EFE8DC',
+                userSelect: 'none',
+              }}
+            >
+              01
+            </div>
+
+            <div style={{ position: 'relative', zIndex: 2, maxWidth: 1280 }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  padding: '6px 16px',
+                  borderRadius: 999,
+                  backgroundColor: '#FEE2E2',
+                  color: '#BE123C',
+                  fontSize: 20,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  marginBottom: 28,
+                }}
+              >
+                {activeScene?.overlay?.chapterTag ?? '全书视觉精读'}
+              </div>
+
+              <div
+                style={{
+                  fontFamily: FONT_SERIF,
+                  fontSize: 106,
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  color: '#18181B',
+                  letterSpacing: '0.04em',
+                  marginBottom: 24,
+                }}
+              >
+                {activeScene?.overlay?.headline ?? bookTitle}
+              </div>
+
+              {activeScene?.overlay?.subtitleText && (
+                <div
+                  style={{
+                    fontSize: 38,
+                    fontWeight: 700,
+                    color: '#44403C',
+                    marginBottom: 36,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {activeScene.overlay.subtitleText}
+                </div>
+              )}
+
+              {/* Hand-drawn Crayon Accent Rule (SVG) */}
+              <svg
+                width="340"
+                height="16"
+                viewBox="0 0 340 16"
+                fill="none"
+                style={{ marginBottom: 38 }}
+              >
+                <path
+                  d="M3 10C78 4 196 13 336 6"
+                  stroke="#E11D48"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              {activeScene?.overlay?.quoteZh && (
                 <div
                   style={{
                     fontFamily: FONT_SERIF,
-                    fontSize: 30,
-                    fontWeight: 700,
-                    color: '#1C1917',
+                    fontSize: 32,
+                    lineHeight: 1.68,
+                    color: '#292524',
+                    maxWidth: 1120,
+                    marginBottom: 26,
                   }}
                 >
-                  {activeScene.overlay?.headline}
+                  “{activeScene.overlay.quoteZh}”
                 </div>
-                {activeScene.overlay?.chapterTag && (
-                  <div
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 600,
-                      color: '#1E3A8A',
-                      backgroundColor: '#EEF2FF',
-                      border: '1px solid #C7D2FE',
-                      padding: '4px 14px',
-                      borderRadius: 6,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {activeScene.overlay.chapterTag}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
 
-            {/* Pure-White Sketchbook Frame with Ken Burns Motion */}
-            <div
-              style={{
-                flex: 1,
-                backgroundColor: '#FFFFFF',
-                borderRadius: 14,
-                border: '2px solid #292524',
-                boxShadow: '6px 6px 0px #E7E5E4',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-              }}
-            >
-              <Img
-                src={`${assetBaseUrl}/video/frames/${activeScene.imageFile}`}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  transform: imgTransform,
-                }}
-              />
-            </div>
-          </div>
-        ) : activeScene?.layout === 'act-title-card' ? (
-          <div
-            style={{
-              maxWidth: 1360,
-              width: '100%',
-              padding: '64px 72px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: 16,
-              border: '2px solid #292524',
-              boxShadow: '8px 8px 0px #E7E5E4',
-              transform: `translateY(${slideY}px)`,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 26,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: '#1E3A8A',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {activeScene.overlay?.chapterTag}
-            </div>
-            <div
-              style={{
-                fontFamily: FONT_SERIF,
-                fontSize: 54,
-                fontWeight: 700,
-                lineHeight: 1.32,
-                color: '#1C1917',
-              }}
-            >
-              {activeScene.overlay?.headline}
-            </div>
-            {activeScene.overlay?.quoteZh && (
-              <div
-                style={{
-                  marginTop: 8,
-                  paddingLeft: 24,
-                  borderLeft: '5px solid #E11D48',
-                  fontFamily: FONT_SERIF,
-                  fontSize: 28,
-                  lineHeight: 1.65,
-                  color: '#44403C',
-                }}
-              >
-                {activeScene.overlay.quoteZh}
-              </div>
-            )}
-            {activeScene.overlay?.quoteSource && (
-              <div style={{ fontSize: 18, color: '#78716C' }}>
-                — {activeScene.overlay.quoteSource}
-              </div>
-            )}
-          </div>
-        ) : activeScene?.layout === 'data-contrast' ? (
-          <div
-            style={{
-              maxWidth: 1480,
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 28,
-              transform: `translateY(${slideY}px)`,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <div style={{ fontFamily: FONT_SERIF, fontSize: 44, fontWeight: 700 }}>
-                {activeScene.overlay?.headline}
-              </div>
-              <div style={{ fontSize: 20, fontWeight: 600, color: '#1E3A8A' }}>
-                {activeScene.overlay?.chapterTag}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 32 }}>
-              {(activeScene.overlay?.statItems ?? []).map((item, idx) => (
+              {activeScene?.overlay?.quoteSource && (
                 <div
-                  key={idx}
                   style={{
-                    flex: 1,
-                    padding: '44px 42px',
-                    borderRadius: 14,
-                    backgroundColor: item.highlight ? '#FFF1F2' : '#FFFFFF',
-                    border: item.highlight ? '2.5px solid #E11D48' : '2px solid #292524',
-                    boxShadow: '6px 6px 0px #E7E5E4',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 20,
+                    fontSize: 22,
+                    fontWeight: 500,
+                    color: '#78716C',
+                    letterSpacing: '0.04em',
                   }}
                 >
-                  <div
-                    style={{
-                      fontFamily: FONT_SERIF,
-                      fontSize: 32,
-                      fontWeight: 700,
-                      color: item.highlight ? '#BE123C' : '#1E3A8A',
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: FONT_SERIF,
-                      fontSize: 28,
-                      lineHeight: 1.65,
-                      color: '#292524',
-                    }}
-                  >
-                    {item.value}
-                  </div>
+                  — {activeScene.overlay.quoteSource}
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        ) : activeScene?.layout === 'quote-spotlight' ? (
-          <div
-            style={{
-              maxWidth: 1380,
-              width: '100%',
-              padding: '64px 76px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: 16,
-              border: '2.5px solid #1E3A8A',
-              boxShadow: '8px 8px 0px #DBEAFE',
-              transform: `translateY(${slideY}px)`,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 28,
-            }}
-          >
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#1E3A8A' }}>
-              {activeScene.overlay?.chapterTag}
-            </div>
-            <div
-              style={{
-                fontFamily: FONT_SERIF,
-                fontSize: 44,
-                fontWeight: 700,
-                lineHeight: 1.5,
-                color: '#1C1917',
-              }}
-            >
-              “{activeScene.overlay?.quoteZh}”
-            </div>
-            {activeScene.overlay?.quoteEn && (
-              <div
-                style={{
-                  fontFamily: FONT_SERIF,
-                  fontStyle: 'italic',
-                  fontSize: 24,
-                  lineHeight: 1.5,
-                  color: '#57534E',
-                }}
-              >
-                {activeScene.overlay.quoteEn}
-              </div>
-            )}
-            {activeScene.overlay?.quoteSource && (
-              <div style={{ fontSize: 20, color: '#78716C', marginTop: 4 }}>
-                —— {activeScene.overlay.quoteSource}
-              </div>
-            )}
           </div>
         ) : (
+          /* Editorial Deep-Ink Closing / Spotlight PPT Slide */
           <div
             style={{
-              maxWidth: 1260,
               width: '100%',
-              padding: '72px 80px',
-              backgroundColor: '#1C1917',
-              color: '#FBF9F5',
-              borderRadius: 16,
-              transform: `translateY(${slideY}px)`,
+              height: '100%',
+              backgroundColor: '#171615',
+              color: '#FAF8F5',
+              position: 'relative',
+              padding: '92px 150px 140px',
+              boxSizing: 'border-box',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: 24,
+              justifyContent: 'center',
             }}
           >
-            <div style={{ fontSize: 20, color: '#FBBF24', letterSpacing: '0.1em' }}>
-              {activeScene?.overlay?.chapterTag}
+            <div
+              style={{
+                position: 'absolute',
+                top: 44,
+                left: 64,
+                right: 64,
+                height: 1,
+                backgroundColor: '#2E2B28',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 20,
+                left: 64,
+                fontSize: 16,
+                fontWeight: 700,
+                color: '#A8A29E',
+                letterSpacing: '0.14em',
+              }}
+            >
+              {activeScene?.overlay?.chapterTag ?? '全书终极命题'}
             </div>
-            <div style={{ fontFamily: FONT_SERIF, fontSize: 52, fontWeight: 700 }}>
-              {activeScene?.overlay?.headline ?? bookTitle}
+            <div
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 64,
+                fontFamily: FONT_MONO,
+                fontSize: 16,
+                color: '#78716C',
+                letterSpacing: '0.08em',
+              }}
+            >
+              {slideNumLabel}
             </div>
-            {activeScene?.overlay?.quoteZh && (
+
+            <div style={{ maxWidth: 1420 }}>
               <div
                 style={{
                   fontFamily: FONT_SERIF,
-                  fontSize: 28,
-                  lineHeight: 1.65,
-                  color: '#E7E5E4',
-                  maxWidth: 960,
+                  fontSize: 64,
+                  fontWeight: 700,
+                  color: '#FBBF24',
+                  lineHeight: 1.25,
+                  marginBottom: 30,
                 }}
               >
-                {activeScene.overlay.quoteZh}
+                {activeScene?.overlay?.headline ?? bookTitle}
               </div>
-            )}
-            {activeScene?.overlay?.quoteSource && (
-              <div style={{ fontSize: 18, color: '#A8A29E', marginTop: 8 }}>
-                {activeScene.overlay.quoteSource}
-              </div>
-            )}
+
+              <svg
+                width="260"
+                height="14"
+                viewBox="0 0 260 14"
+                fill="none"
+                style={{ marginBottom: 40 }}
+              >
+                <path
+                  d="M3 8C72 3 162 12 256 6"
+                  stroke="#E11D48"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              {activeScene?.overlay?.quoteZh && (
+                <div
+                  style={{
+                    fontFamily: FONT_SERIF,
+                    fontSize: 38,
+                    lineHeight: 1.72,
+                    color: '#F5F5F4',
+                    marginBottom: 42,
+                  }}
+                >
+                  “{activeScene.overlay.quoteZh}”
+                </div>
+              )}
+
+              {activeScene?.overlay?.quoteSource && (
+                <div
+                  style={{
+                    fontSize: 22,
+                    color: '#A8A29E',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  —— {activeScene.overlay.quoteSource}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Persistent Bottom Podcast HUD (Dual Speaker + Live Subtitle + Progress) */}
-      <div
-        style={{
-          height: 178,
-          padding: '16px 64px 20px',
-          backgroundColor: '#F6F2EA',
-          borderTop: '1px solid #D6D3D1',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          gap: 10,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 28, flex: 1 }}>
-          {/* Dual Host Live Indicators */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 220, flexShrink: 0 }}>
-            {(['A', 'B'] as const).map((hid) => {
-              const speaking = activeCue?.hostId === hid;
-              const accent = hid === 'A' ? '#1E3A8A' : '#BE123C';
-              return (
-                <div
-                  key={hid}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '6px 14px',
-                    borderRadius: 8,
-                    backgroundColor: speaking ? '#FFFFFF' : 'transparent',
-                    border: speaking ? `2px solid ${accent}` : '1px solid #D6D3D1',
-                    opacity: speaking ? 1 : 0.55,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span
-                      style={{
-                        fontFamily: FONT_SERIF,
-                        fontSize: 20,
-                        fontWeight: 700,
-                        color: speaking ? accent : '#44403C',
-                      }}
-                    >
-                      {hosts[hid].name}
-                    </span>
-                    <span style={{ fontSize: 13, color: '#78716C' }}>
-                      {hid === 'A' ? '主讲' : '对谈'}
-                    </span>
-                  </div>
-                  <VoiceWaveBars frame={frame} active={speaking} color={accent} />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Live Synchronized Subtitle Box */}
-          <div
-            style={{
-              flex: 1,
-              minHeight: 96,
-              padding: '14px 26px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: 10,
-              border: '1px solid #E7E5E4',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: FONT_SERIF,
-                fontSize: 30,
-                fontWeight: 600,
-                lineHeight: 1.48,
-                color: '#1C1917',
-              }}
-            >
-              {activeCue ? activeCue.text : `${bookTitle} · 双人整书深读播客`}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom 7-Act Timeline Bar */}
+      {/* Sleek Floating Cinema Subtitle (Hidden cleanly during silence or still-export mode) */}
+      {!hideSubtitle && activeCue ? (
         <div
           style={{
-            height: 6,
-            width: '100%',
-            backgroundColor: '#E7E5E4',
-            borderRadius: 3,
-            overflow: 'hidden',
+            position: 'absolute',
+            left: 96,
+            right: 96,
+            bottom: 34,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 20,
           }}
         >
           <div
             style={{
-              height: '100%',
-              width: `${(progressRatio * 100).toFixed(3)}%`,
-              backgroundColor: '#1E3A8A',
+              backgroundColor: 'rgba(22, 21, 20, 0.84)',
+              color: '#FAFAF9',
+              padding: '12px 30px',
+              borderRadius: 12,
+              fontFamily: FONT_SANS,
+              fontSize: 34,
+              fontWeight: 500,
+              lineHeight: 1.4,
+              letterSpacing: '0.03em',
+              textAlign: 'center',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
             }}
-          />
+          >
+            {activeCue.text}
+          </div>
         </div>
+      ) : null}
+
+      {/* Whisper-thin 3px Bottom Editorial Progress Line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 4,
+          backgroundColor: isDarkSlide ? 'rgba(255,255,255,0.08)' : 'rgba(28,25,23,0.06)',
+          zIndex: 30,
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: `${(slideProgressRatio * 100).toFixed(2)}%`,
+            backgroundColor: '#E11D48',
+          }}
+        />
       </div>
     </AbsoluteFill>
   );

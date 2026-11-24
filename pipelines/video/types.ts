@@ -3,6 +3,10 @@ import type { PodcastTtsProvider } from '../../content/podcast/types';
 export type VideoAspectRatio = '16:9' | '9:16';
 
 export type VideoSceneLayout =
+  | 'ppt-cover'
+  | 'ppt-slide'
+  | 'ppt-quote'
+  | 'ppt-closing'
   | 'act-title-card'
   | 'editorial-illustration'
   | 'quote-spotlight'
@@ -14,7 +18,7 @@ export type KenBurnsMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' |
 export interface VideoStyleBible {
   /** Shared art-direction prefix prepended to every GPT Image 2.5 prompt */
   promptPrefix: string;
-  /** Explicit negative/avoidance instructions (e.g. "no text, no Chinese characters, no watermarks") */
+  /** Shared finish and composition suffix appended to every prompt */
   promptSuffix: string;
   /** Book-specific accent palette aligned with the reading UI */
   palette: {
@@ -27,6 +31,7 @@ export interface VideoStyleBible {
 export interface VideoSceneOverlay {
   chapterTag?: string;
   headline?: string;
+  subtitleText?: string;
   quoteZh?: string;
   quoteEn?: string;
   quoteSource?: string;
@@ -47,7 +52,7 @@ export interface VideoStoryboardScene {
   endSec: number;
   layout: VideoSceneLayout;
   motion: KenBurnsMotion;
-  /** Required for editorial-illustration scenes; omitted for pure code-driven typography/data cards */
+  /** Required for illustrated PPT slide scenes; omitted for pure typographic cover/closing slides */
   imagePrompt?: string;
   /** Relative filename under artifacts/<slug>/video/frames/, e.g. "scene-02.png" */
   imageFile?: string;
@@ -63,7 +68,7 @@ export interface VideoStoryboard {
   episodeTitle: string;
   audioProvider: PodcastTtsProvider;
   aspectRatio: VideoAspectRatio;
-  fps: 30;
+  fps: number;
   width: number;
   height: number;
   totalDurationSec: number;

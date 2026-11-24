@@ -135,17 +135,28 @@ function extractTaskRecord(payload: unknown, taskId: string): Record<string, unk
 async function downloadImageFromUrl(
   url: string
 ): Promise<{ buffer: Buffer; contentType: string }> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-  if (!res.ok) {
-    throw new Error(`下载生成图片失败 (${res.status}): ${url}`);
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(90_000) });
+      if (!res.ok) {
+        throw new Error(`下载生成图片失败 (${res.status}): ${url}`);
+      }
+      const arrayBuf = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+      if (buffer.length === 0) {
+        throw new Error(`下载到的图片内容为空: ${url}`);
+      }
+      const contentType = res.headers.get('content-type') || 'image/png';
+      return { buffer, contentType };
+    } catch (err) {
+      lastErr = err;
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+      }
+    }
   }
-  const arrayBuf = await res.arrayBuffer();
-  const buffer = Buffer.from(arrayBuf);
-  if (buffer.length === 0) {
-    throw new Error(`下载到的图片内容为空: ${url}`);
-  }
-  const contentType = res.headers.get('content-type') || 'image/png';
-  return { buffer, contentType };
+  throw lastErr;
 }
 
 async function materializeImage(
@@ -180,21 +191,38 @@ export async function pollImageTask(
   const origin = getApiOrigin(config.baseUrl);
   const pollUrl = `${origin}/api/image-tasks?ids=${encodeURIComponent(taskId)}`;
   const pollIntervalMs = options.pollIntervalMs ?? 3000;
-  const maxPollMs = options.maxPollMs ?? 180_000;
+  const maxPollMs = options.maxPollMs ?? 240_000;
   const startedAt = Date.now();
   let attempt = 0;
 
   while (Date.now() - startedAt < maxPollMs) {
     attempt += 1;
-    const res = await fetch(pollUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-      signal: AbortSignal.timeout(30_000),
-    });
+    let res: Response;
+    try {
+      res = await fetch(pollUrl, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        signal: AbortSignal.timeout(35_000),
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      options.onStatus?.(
+        `[image] poll #${attempt} transient error for ${taskId} (${msg}), retrying...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+      continue;
+    }
 
     if (!res.ok) {
+      if (res.status >= 500 || res.status === 429) {
+        options.onStatus?.(
+          `[image] poll #${attempt} HTTP ${res.status} for ${taskId}, retrying...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+        continue;
+      }
       const text = await res.text().catch(() => '');
       throw new Error(`查询异步生图任务失败 (${res.status}): ${text.slice(0, 300)}`);
     }

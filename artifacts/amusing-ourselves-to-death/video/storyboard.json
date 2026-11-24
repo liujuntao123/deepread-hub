@@ -5,14 +5,14 @@
   "episodeTitle": "《娱乐至死》全书深读：当所有认真的事都必须长得像娱乐",
   "audioProvider": "fish",
   "aspectRatio": "16:9",
-  "fps": 30,
+  "fps": 24,
   "width": 1920,
   "height": 1080,
-  "totalDurationSec": 1690.61,
-  "generatedAt": "2026-11-23T08:11:15.313Z",
+  "totalDurationSec": 1654.25,
+  "generatedAt": "2026-11-24T01:01:31.011Z",
   "styleBible": {
-    "promptPrefix": "Loose, sketchy hand-drawn editorial illustration on clean white paper, quickly scrawled with wax crayons, dry colored pencils, and broad felt markers in the spirit of sharp newspaper op-ed comics and intellectual magazine column art. Linework: fast, gestural, sketchy black ink and dark crayon strokes with uneven weight, hurried cross-hatching, loose overlapping construction lines, and raw broken contours. Color & texture: vivid direct editorial hues (red, yellow, cobalt blue, orange, violet, green) applied in rapid, grainy crayon shading and flat marker swipes that casually bleed past the contours, leaving raw paper grain and uncolored white gaps visible. Figures & objects: adult editorial caricature and witty visual shorthand—lean, expressive silhouettes, sharp understated posture, wry observant expressions, and stylized everyday objects distilled to a few confident, hurried strokes. Composition: open white-paper editorial layout with clear visual hierarchy, generous breathing space, and sparse scrawled directional arrows or crisp graphic marks that anchor the concept.",
-    "promptSuffix": "Texture finish: raw analog sketchbook immediacy, fast loose hand-scrawled energy, dry wax-crayon grain, and flat marker paper tooth. Clean pure white background, wordless editorial visual storytelling.",
+    "promptPrefix": "Widescreen 16:9 hand-drawn editorial presentation slide on clean pure-white paper, quickly sketched with wax crayons, dry colored pencils, and broad felt markers in the spirit of sharp newspaper op-ed infographics and intellectual visual essays. Linework: fast, gestural, sketchy black ink and dark crayon strokes with uneven weight, hurried cross-hatching, loose overlapping construction lines, and expressive broken contours. Color & texture: vivid direct editorial hues (vermilion red, mustard yellow, cobalt blue, burnt orange, violet, forest green) applied in rapid grainy crayon shading and flat marker swipes that casually bleed past contours, leaving raw paper grain and clean white breathing space. Figures & objects: sharp adult editorial caricature and witty visual shorthand—lean expressive silhouettes, understated ironic posture, and distilled iconic objects rendered in confident hurried strokes. Slide layout & Chinese hand-lettering: structured like a high-craft hand-sketched keynote PPT page with clear visual hierarchy, sketchy directional arrows, marker underlines, and concise, crisp, accurately written hand-lettered Simplified Chinese title and 2-3 short keyword callouts integrated organically into the white space.",
+    "promptSuffix": "Keep every Simplified Chinese character clean, legible, bold, and accurately spelled in natural dark-ink or marker hand-lettering. Reserve the bottom 15% strip of the canvas as clean pure-white paper breathing space for subtitles. Texture finish: raw analog sketchbook immediacy, dry wax-crayon grain, flat marker tooth, pure white background (#FFFFFF).",
     "palette": {
       "paperBg": "#FFFFFF",
       "inkPrimary": "#1C1917",
@@ -26,14 +26,15 @@
       "startSegmentId": "seg-01",
       "endSegmentId": "seg-01",
       "startSec": 0,
-      "endSec": 29.27,
-      "layout": "act-title-card",
+      "endSec": 29.24,
+      "layout": "ppt-cover",
       "motion": "static",
       "overlay": {
-        "chapterTag": "第一幕 · 前言与现场起手",
-        "headline": "为什么《美丽新世界》比《一九八四》更难防？",
+        "chapterTag": "全书视觉精读 · 1985",
+        "headline": "娱乐至死",
+        "subtitleText": "当所有认真的事，都必须长得像娱乐",
         "quoteZh": "自由社会真正该警惕的，不是老大哥强迫你闭嘴，而是没人逼你，你自己却笑着放下了书本。",
-        "quoteSource": "尼尔·波兹曼《娱乐至死》（1985）"
+        "quoteSource": "尼尔·波兹曼（Neil Postman） · 全书深读"
       }
     },
     {
@@ -41,367 +42,440 @@
       "actId": "act-1",
       "startSegmentId": "seg-02",
       "endSegmentId": "seg-02",
-      "startSec": 29.27,
-      "endSec": 61.91,
-      "layout": "data-contrast",
+      "startSec": 29.24,
+      "endSec": 61.26,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A two-column editorial comparison PPT slide divided by a sketchy red vertical marker line. Top hand-lettered Chinese title: \"两种反乌托邦预言\". Left side labeled \"奥威尔《一九八四》\" with dark cobalt/charcoal crayon sketch of an iron boot stomping locked books and a looming surveillance eye, short hand-lettered Chinese callout: \"憎恨的东西毁掉我们 / 强权禁书\". Right side labeled \"赫胥黎《美丽新世界》\" in vivid vermilion & mustard yellow crayon showing a grinning figure reclining under glowing screens and smiling pills with untouched books tossed aside, bold red-underlined Chinese callout: \"热爱的东西毁掉我们 / 无人想读\".",
+      "imageFile": "scene-02.png",
       "overlay": {
-        "chapterTag": "前言 · 两种反乌托邦预言",
-        "headline": "奥威尔的恐惧 vs 赫胥黎的警告",
-        "statItems": [
-          {
-            "label": "奥威尔《一九八四》",
-            "value": "憎恨的东西毁掉我们：强权禁书、剥夺信息、真理被强行隐藏"
-          },
-          {
-            "label": "赫胥黎《美丽新世界》",
-            "value": "热爱的东西毁掉我们：无人禁书却无人想读、真理淹没在无聊琐碎中",
-            "highlight": true
-          }
-        ]
-      }
+        "chapterTag": "第一幕 · 两种反乌托邦",
+        "headline": "奥威尔的恐惧 vs 赫胥黎的警告"
+      },
+      "promptHash": "8f46f902004f"
     },
     {
       "sceneId": "scene-03",
       "actId": "act-1",
       "startSegmentId": "seg-03",
-      "endSegmentId": "seg-06",
-      "startSec": 61.91,
-      "endSec": 182.22,
-      "layout": "editorial-illustration",
-      "motion": "zoom-in",
-      "imagePrompt": "A sharp editorial satire of a 1983 television panel show after a nuclear-war film: five suited intellectuals and statesmen sit in a stiff row under glaring studio spotlights as if on a beauty-pageant stage, each isolated under a tiny ticking hourglass with zero eye contact or debate, while floating applause bursts and showbiz confetti drift across the studio floor.",
+      "endSegmentId": "seg-04",
+      "startSec": 61.26,
+      "endSec": 107.78,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "An editorial infographic PPT slide depicting the 1983 ABC television panel after the nuclear-war film The Day After. Top hand-lettered Chinese title: \"1983《浩劫后》80分钟无广告直播\". Center illustration: five sharp adult caricatures of famous statesmen and scholars (Kissinger, McNamara, Carl Sagan, Elie Wiesel, Buckley) seated stiffly under blinding yellow-crayon studio spotlights, with crossed-out commercial icons on the margin. Hand-lettered Chinese callouts with sketchy arrows: \"清空广告与配乐\" and \"顶级政要与学者同台\".",
       "imageFile": "scene-03.png",
-      "promptHash": "2146db4b45c8",
+      "promptHash": "67e71f0d6584",
       "overlay": {
-        "chapterTag": "第 6 章 · 1983《浩劫后》80 分钟无广告现场",
-        "headline": "撤掉广告与配乐，电视讨论为何依然像一场选美？"
+        "chapterTag": "第一幕 · 1983 现场起手",
+        "headline": "清空广告与配乐，顶级学者讨论核战争"
       }
     },
     {
       "sceneId": "scene-04",
-      "actId": "act-2",
-      "startSegmentId": "seg-07",
-      "endSegmentId": "seg-07",
-      "startSec": 182.22,
-      "endSec": 206.78,
-      "layout": "act-title-card",
+      "actId": "act-1",
+      "startSegmentId": "seg-05",
+      "endSegmentId": "seg-06",
+      "startSec": 107.78,
+      "endSec": 179.06,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A sharp satirical PPT slide showing why the 1983 panel collapsed into showbiz. Top hand-lettered Chinese title: \"为何严肃辩论滑向选美秀？\". Center sketch: speakers trapped inside isolated 5-minute hourglass bubbles with zero debate lines connecting them, confetti and applause bursts raining down like a beauty pageant; bottom-right mini conceptual diagram with red arrow from \"技术（机器）\" to \"媒介（文化空气）\", and a bold marker callout: \"除了娱乐业，没有其他行业\".",
+      "imageFile": "scene-04.png",
       "overlay": {
-        "chapterTag": "第二幕 · 第 1–2 章",
-        "headline": "媒介即隐喻与认识论：工具如何决定什么是真理",
-        "quoteZh": "文化重心从印刷之都纽约转向娱乐之都拉斯维加斯。"
-      }
+        "chapterTag": "第一幕 · 技术与媒介之分",
+        "headline": "每人五分钟独白：除了娱乐业没有其他行业"
+      },
+      "promptHash": "b86a9118aeec"
     },
     {
       "sceneId": "scene-05",
       "actId": "act-2",
-      "startSegmentId": "seg-08",
-      "endSegmentId": "seg-09",
-      "startSec": 206.78,
-      "endSec": 281.22,
-      "layout": "editorial-illustration",
-      "motion": "pan-right",
-      "imagePrompt": "Split editorial sketch on white paper: on the left, a frustrated thinker crouches by a small campfire trying to send complex philosophical diagrams through rising black smoke puffs that immediately scatter in the wind; on the right, a giant sketchy mechanical clock slices a yellow sunbeam into rigid numbered wedges and coins.",
+      "startSegmentId": "seg-07",
+      "endSegmentId": "seg-08",
+      "startSec": 179.06,
+      "endSec": 235.97,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "An editorial concept PPT slide on \"Media as Metaphor\". Top hand-lettered Chinese title: \"媒介即隐喻：形式排除内容\". Left sketch: a wry philosopher crouching by a small campfire trying to send dense geometric logic symbols via rising smoke puffs that instantly scatter in the wind, Chinese tag: \"烟雾发不出哲学\". Right sketch: a portly 1900s president silhouette (Taft) speaking confidently into a vintage radio mic yet cropped awkwardly out of a glowing TV close-up frame, Chinese tag: \"镜头先于开口否决\".",
       "imageFile": "scene-05.png",
-      "promptHash": "686793768273",
+      "promptHash": "8c9df7038087",
       "overlay": {
-        "chapterTag": "第 1 章 · 媒介即隐喻",
-        "headline": "烟雾发不出哲学，钟表把时间切成了商品"
+        "chapterTag": "第二幕 · 媒介即隐喻",
+        "headline": "烟雾发不出哲学，形式早已筛掉了内容"
       }
     },
     {
       "sceneId": "scene-06",
       "actId": "act-2",
-      "startSegmentId": "seg-10",
-      "endSegmentId": "seg-13",
-      "startSec": 281.22,
-      "endSec": 419.9,
-      "layout": "editorial-illustration",
-      "motion": "zoom-out",
-      "imagePrompt": "Wry university dissertation defense sketch: a nervous graduate student gestures toward his ear while pointing to spoken airwaves, facing three stern professors behind a heavy stack of red-stamped printed books; in the upper margin, a wry sketchy horse grins showing its teeth beside an ancient Greek scroll.",
+      "startSegmentId": "seg-09",
+      "endSegmentId": "seg-09",
+      "startSec": 235.97,
+      "endSec": 278.68,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A crisp hand-drawn visual-essay PPT slide showing how tools reshape human cognition. Top hand-lettered Chinese title: \"工具如何改写心智\". Three sketchy editorial vignettes linked by red marker arrows: a giant mechanical clock slicing a yellow sunbeam into numbered coins (\"钟表：时间变成商品\"), a pair of 12th-century spectacles and a microscope lens revealing hidden worlds (\"眼镜与显微镜：拓展认知边界\"), and a bold bottom marker flow chain: \"语言 → 媒介 → 隐喻 → 文化内容\".",
       "imageFile": "scene-06.png",
-      "promptHash": "ddc5aad7e856",
+      "promptHash": "a436c35cf3d9",
       "overlay": {
-        "chapterTag": "第 2 章 · 媒介即认识论",
-        "headline": "博士口试脚注与亚里士多德数马牙：真理要挑外衣穿"
+        "chapterTag": "第二幕 · 隐喻创造文化",
+        "headline": "钟表、眼镜与显微镜：语言→媒介→隐喻→文化"
       }
     },
     {
       "sceneId": "scene-07",
       "actId": "act-2",
-      "startSegmentId": "seg-14",
-      "endSegmentId": "seg-14",
-      "startSec": 419.9,
-      "endSec": 447.32,
-      "layout": "quote-spotlight",
+      "startSegmentId": "seg-10",
+      "endSegmentId": "seg-10",
+      "startSec": 278.68,
+      "endSec": 309.5,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A witty editorial PPT slide clarifying Postman’s real target. Top hand-lettered Chinese title: \"危险不在低俗，而在严肃使命娱乐化\". Left side in light blue & green crayon: goofy soap operas and comedy shows inside a small TV labeled with a green checkmark \"纯消遣无伤大雅\". Right side in sharp vermilion red & black crayon: a glowing TV wearing a judge wig, graduation cap, and news anchor tie trying to issue a giant stamped \"真理通行证\", marked with a bold red warning exclamation.",
+      "imageFile": "scene-07.png",
       "overlay": {
-        "chapterTag": "第 1–2 章 · 核心原理与三道防线",
-        "quoteZh": "你根本不可能用烟雾来表现哲学，它的形式已经排除了它的内容。",
-        "quoteEn": "You cannot use smoke to do philosophy. Its form excludes the content.",
-        "quoteSource": "《娱乐至死》第 1 章 · 媒介形式决定话语形态"
-      }
+        "chapterTag": "第二幕 · 媒介即认识论",
+        "headline": "电视上的消遣不可怕，可怕的是谁发“真理通行证”"
+      },
+      "promptHash": "d65e742e82e0"
     },
     {
       "sceneId": "scene-08",
-      "actId": "act-3",
-      "startSegmentId": "seg-15",
-      "endSegmentId": "seg-15",
-      "startSec": 447.32,
-      "endSec": 477.76,
-      "layout": "act-title-card",
+      "actId": "act-2",
+      "startSegmentId": "seg-11",
+      "endSegmentId": "seg-12",
+      "startSec": 309.5,
+      "endSec": 378.9,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A wry two-part satirical PPT slide. Top hand-lettered Chinese title: \"真理必须挑外衣穿\". Main left illustration: a flustered PhD candidate gesturing to spoken airwaves while four stern professors behind a towering fortress of red-stamped printed books reject his oral footnote, labeled \"博士口试：只认白纸黑字\". Upper-right witty vignette: ancient Greek thinker Aristotle stroking his beard beside a scroll while a grinning horse shows its teeth nearby, labeled \"亚里士多德从不数牙齿\".",
+      "imageFile": "scene-08.png",
       "overlay": {
-        "chapterTag": "第三幕 · 第 3–4 章",
-        "headline": "铅字共和国：1854 年皮奥里亚集市与阐释年代",
-        "quoteZh": "在印刷机主宰的时代，普通农夫与工匠曾能消化持续数小时的书面逻辑交锋。"
-      }
+        "chapterTag": "第二幕 · 真理的外衣",
+        "headline": "博士口试脚注与亚里士多德的讽刺"
+      },
+      "promptHash": "f7afb9159cda"
     },
     {
       "sceneId": "scene-09",
-      "actId": "act-3",
-      "startSegmentId": "seg-16",
-      "endSegmentId": "seg-18",
-      "startSec": 477.76,
-      "endSec": 582.05,
-      "layout": "editorial-illustration",
-      "motion": "pan-left",
-      "imagePrompt": "Dynamic editorial sketch of an 18th-century wooden printing press cranking out crisp pamphlets that flutter across the page into the hands of everyday artisans, dockworkers, and farmers walking down a colonial street, absorbed in dense pages, while a tiny classical lyre fades at the corner.",
+      "actId": "act-2",
+      "startSegmentId": "seg-13",
+      "endSegmentId": "seg-14",
+      "startSec": 378.9,
+      "endSec": 440.66,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "An editorial framework PPT slide contrasting definitions of intelligence. Top hand-lettered Chinese title: \"智力标尺的转移与三条防线\". Upper half split comparison: left shows crowned King Solomon surrounded by floating spoken proverbs (\"口语时代：3000条谚语记忆\"), right shows a still reader calmly turning dense printed pages (\"印刷时代：静坐思辨 · 推迟判断\"). Lower band in neat marker callout strip with three small shields: \"① 非相对论  ② 变的是话语而非脑容量  ③ 残余认识论\".",
       "imageFile": "scene-09.png",
-      "promptHash": "a30813bd6712",
+      "promptHash": "60e4aa00ec7e",
       "overlay": {
-        "chapterTag": "第 3 章 · 印刷机统治下的美国",
-        "headline": "《常识》狂销数十万册与 3000 座“学园运动”演讲厅"
+        "chapterTag": "第二幕 · 智力标尺与防线",
+        "headline": "从背诵谚语到“推迟判断”及三条边界防线"
       }
     },
     {
       "sceneId": "scene-10",
       "actId": "act-3",
-      "startSegmentId": "seg-19",
-      "endSegmentId": "seg-21",
-      "startSec": 582.05,
-      "endSec": 699.24,
-      "layout": "editorial-illustration",
-      "motion": "zoom-in",
-      "imagePrompt": "Loose newspaper-style sketch of the 1854 Peoria outdoor debate: tall lean Abraham Lincoln in a stovepipe silhouette and stocky Stephen Douglas stand on a timber platform exchanging sharp logical arguments across a packed crowd of attentive farmers and townsfolk, with a sketchy seven-hour clock arc sweeping overhead from afternoon sun to evening moon.",
+      "startSegmentId": "seg-15",
+      "endSegmentId": "seg-16",
+      "startSec": 440.66,
+      "endSec": 494.45,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A punchy hand-drawn data infographic PPT slide about Colonial America’s print culture. Top hand-lettered Chinese title: \"铅字共和国的硬数据\". Left hand-drawn crayon bar chart showing colonial literacy in 1640-1700: tall cobalt bar \"男性识字率 89%–95%\" and orange bar \"女性约 62%\". Right sketch: Thomas Paine’s pamphlet Common Sense bursting out of a wooden press with dramatic red arrow comparing \"1776年售出 30–40万册\" to a stadium icon \"≈ 1985年 2400万册（比肩超级碗）\".",
       "imageFile": "scene-10.png",
-      "promptHash": "d286f2921eb0",
+      "promptHash": "e7e7082d9c65",
       "overlay": {
-        "chapterTag": "第 4 章 · 1854 皮奥里亚 7 小时辩论与史料边界",
-        "headline": "三小时演说 + 三小时反驳：阐释年代的理性耐力"
+        "chapterTag": "第三幕 · 铅字共和国",
+        "headline": "高达 95% 的识字率与《常识》狂销奇迹"
       }
     },
     {
       "sceneId": "scene-11",
-      "actId": "act-4",
-      "startSegmentId": "seg-22",
-      "endSegmentId": "seg-22",
-      "startSec": 699.24,
-      "endSec": 719.42,
-      "layout": "act-title-card",
+      "actId": "act-3",
+      "startSegmentId": "seg-17",
+      "endSegmentId": "seg-18",
+      "startSec": 494.45,
+      "endSec": 572.23,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "An editorial storytelling PPT slide about the Lyceum Movement and print authority. Top hand-lettered Chinese title: \"3000座演讲厅与铅字的威严\". Center sketch: tired artisans and factory workers streaming after work into a packed wooden lecture hall labeled \"1835 学园运动 · 3000+演讲厅\". Side vignette: a cautious colonial sect waving hands away from a heavy printing press (\"拒印教义：怕被铅字永远束缚\"). Bottom-right poetic sketch of a fading classical lyre beside iron type blocks with Chinese callout: \"有印刷机，还会有《伊利亚特》吗？\".",
+      "imageFile": "scene-11.png",
       "overlay": {
-        "chapterTag": "第四幕 · 第 5 章",
-        "headline": "语境爆破：电报、银版照片与“躲躲猫的世界”",
-        "quoteZh": "早在第一台电视机诞生之前，印刷时代的理性语境已被两枚 19 世纪炸药炸碎。"
-      }
+        "chapterTag": "第三幕 · 印刷机统治下的美国",
+        "headline": "3000 座“学园运动”演讲厅与铅字定论"
+      },
+      "promptHash": "ff8cf62198ca"
     },
     {
       "sceneId": "scene-12",
-      "actId": "act-4",
-      "startSegmentId": "seg-23",
-      "endSegmentId": "seg-24",
-      "startSec": 719.42,
-      "endSec": 777.38,
-      "layout": "editorial-illustration",
-      "motion": "pan-right",
-      "imagePrompt": "Sketchy editorial diagram of 1844 telegraph poles and frantic black wires racing far ahead of a puffing steam locomotive across continents and ocean waves, with dozens of tiny disconnected paper snippets, exclamation marks, and trivia bubbles dangling randomly along the buzzing wire.",
+      "actId": "act-3",
+      "startSegmentId": "seg-19",
+      "endSegmentId": "seg-19",
+      "startSec": 572.23,
+      "endSec": 609.57,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A vibrant hand-drawn historical PPT slide of the 1854 Peoria Lincoln-Douglas debate. Top hand-lettered Chinese title: \"1854 皮奥里亚：7小时户外辩论\". Center illustration: tall lean Abraham Lincoln and stocky Stephen Douglas debating on a timber outdoor stage before an attentive crowd of farmers and townsfolk, with a giant sketchy yellow-to-indigo sky arc above showing the timeline in crisp Chinese callouts: \"道格拉斯 3小时演说\" → \"回家吃晚饭\" → \"林肯 4小时反驳\".",
       "imageFile": "scene-12.png",
-      "promptHash": "15d2a9ee6f6d",
+      "promptHash": "b30c033f63ee",
       "overlay": {
-        "chapterTag": "第 5 章 · 1844 莫尔斯电报",
-        "headline": "信息摆脱肉身速度，却沦为与行动无关的碎片"
+        "chapterTag": "第三幕 · 阐释年代巅峰",
+        "headline": "三小时演说 + 回家吃晚饭 + 四小时反驳"
       }
     },
     {
       "sceneId": "scene-13",
-      "actId": "act-4",
-      "startSegmentId": "seg-25",
-      "endSegmentId": "seg-27",
-      "startSec": 777.38,
-      "endSec": 896.8,
-      "layout": "editorial-illustration",
-      "motion": "zoom-out",
-      "imagePrompt": "Loose expressive editorial sketch of a vintage bellows camera bursting open like a jack-in-the-box, shooting out isolated monochrome photo snapshots of unrelated events that pop in and vanish midair above an open newspaper crossword puzzle, conveying a fragmented peek-a-boo world.",
+      "actId": "act-3",
+      "startSegmentId": "seg-20",
+      "endSegmentId": "seg-21",
+      "startSec": 609.57,
+      "endSec": 683.28,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A split editorial PPT slide covering print-era ads and historical sampling boundaries. Top hand-lettered Chinese title: \"广告语境的断裂与史料边界\". Left side: a clean 1704 text-only newspaper ad filled with calm prose (\"1704 纯文字说理广告\") transitioning via jagged red lightning to flashy 1890s illustrated baby-cereal & cigarette posters (\"1890s 图像与口号侵入\"). Right margin card framed with a dashed cobalt pen line showing silhouetted figures standing outside a 19th-century polling booth, labeled \"清醒边界：当时被排除在外的女性与底层人群\".",
       "imageFile": "scene-13.png",
-      "promptHash": "d7950d1d3482",
+      "promptHash": "ec513f96e6c9",
       "overlay": {
-        "chapterTag": "第 5 章 · 银版照相术与“伪语境”",
-        "headline": "孤立的图像没有逻辑命题，新闻退化为填字游戏的消遣"
+        "chapterTag": "第三幕 · 广告转型与史料边界",
+        "headline": "从纯文字散文广告到图像侵入，兼看采样边界"
       }
     },
     {
       "sceneId": "scene-14",
-      "actId": "act-5",
-      "startSegmentId": "seg-28",
-      "endSegmentId": "seg-28",
-      "startSec": 896.8,
-      "endSec": 920.27,
-      "layout": "act-title-card",
+      "actId": "act-4",
+      "startSegmentId": "seg-22",
+      "endSegmentId": "seg-24",
+      "startSec": 683.28,
+      "endSec": 760.14,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "An energetic editorial infographic PPT slide on the 1844 telegraph revolution. Top hand-lettered Chinese title: \"1844 莫尔斯电报：信息—行动比崩溃\". Illustration: frantic buzzing black telegraph wires racing far ahead of a puffing steam locomotive labeled \"火车 35英里/时\", shooting irrelevant trivia bubbles across the ocean with a wry Thoreau doodle asking \"公主得了百日咳？\". Bold red marker summary tag: \"信息摆脱肉身，却与行动彻底脱节\".",
+      "imageFile": "scene-14.png",
       "overlay": {
-        "chapterTag": "第五幕 · 第 7–8 章",
-        "headline": "“好……现在”与电子教堂：新闻和神坛的娱乐化改写",
-        "quoteZh": "当电视成为主导认识论，严肃机构不得不主动按表演逻辑改写自己。"
-      }
+        "chapterTag": "第四幕 · 语境爆破（一）",
+        "headline": "电报跑赢火车，信息—行动比第一次崩溃"
+      },
+      "promptHash": "dd09c94566c0"
     },
     {
       "sceneId": "scene-15",
-      "actId": "act-5",
-      "startSegmentId": "seg-29",
-      "endSegmentId": "seg-32",
-      "startSec": 920.27,
-      "endSec": 1060.19,
-      "layout": "editorial-illustration",
-      "motion": "zoom-in",
-      "imagePrompt": "Sharp op-ed cartoon sketch of a polished TV news anchor flashing a rehearsed grin behind a desk; the backdrop screen is slashed diagonally by a jagged red lightning bolt—one half shows somber smoky crisis silhouettes, the other half bursts into a cheerful yellow weather sun, sports trophy, and floating musical jingle notes.",
+      "actId": "act-4",
+      "startSegmentId": "seg-25",
+      "endSegmentId": "seg-25",
+      "startSec": 760.14,
+      "endSec": 799.11,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A conceptual editorial PPT slide on the invention of photography. Top hand-lettered Chinese title: \"图像革命：辨认 vs 理解\". Left side: a vintage bellows camera snapping a framed snapshot of a single concrete oak tree (\"相机只能定格此时此地的橡树\"), tagged \"看照片只需辨认\". Right side: an open book radiating abstract scales of justice and logical links (\"文字可探讨抽象与真假\"), tagged \"看文字需要理解\".",
       "imageFile": "scene-15.png",
-      "promptHash": "33aa1dcf74f4",
+      "promptHash": "f43dac2b99da",
       "overlay": {
-        "chapterTag": "第 7 章 · “好……现在”新闻语法",
-        "headline": "45 秒灾难后瞬间切入彩蛋与广告，前后矛盾不再重要"
+        "chapterTag": "第四幕 · 语境爆破（二）",
+        "headline": "看照片只需要辨认，看文字却需要理解"
       }
     },
     {
       "sceneId": "scene-16",
-      "actId": "act-5",
-      "startSegmentId": "seg-33",
-      "endSegmentId": "seg-35",
-      "startSec": 1060.19,
-      "endSec": 1158.28,
-      "layout": "editorial-illustration",
-      "motion": "pan-left",
-      "imagePrompt": "Wry editorial sketch of a living room seen from over the shoulder: a relaxed viewer slumped on a couch holding a snack bag in one hand and a TV remote in the other, watching a charismatic television preacher standing under dazzling neon show-stage spotlights framed by rising ratings charts and coin symbols.",
+      "actId": "act-4",
+      "startSegmentId": "seg-26",
+      "endSegmentId": "seg-27",
+      "startSec": 799.11,
+      "endSec": 875.38,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A clever satirical PPT slide illustrating \"Pseudo-context\" and the \"Peek-a-boo World\". Top hand-lettered Chinese title: \"伪语境与“躲躲猫的世界”\". Center illustration: a giant crossword puzzle and quiz-show buzzer catching dozens of tiny unrelated news snapshots popping up and vanishing midair, feeding directly into a glowing crowned retro TV labeled \"电视：元媒介（决定我们怎样认识世界）\". Crisp Chinese callout: \"为无用信息制造问题\".",
       "imageFile": "scene-16.png",
-      "promptHash": "1afb5f1bd8dd",
+      "promptHash": "9c55dd5ddebd",
       "overlay": {
-        "chapterTag": "第 8 章 · 42 小时电子教堂观察",
-        "headline": "危险不在于宗教成了电视内容，而在于电视成了宗教内容"
+        "chapterTag": "第四幕 · 伪语境与元媒介",
+        "headline": "填字游戏与“躲躲猫的世界”：电视升格为元媒介"
       }
     },
     {
       "sceneId": "scene-17",
-      "actId": "act-6",
-      "startSegmentId": "seg-36",
-      "endSegmentId": "seg-36",
-      "startSec": 1158.28,
-      "endSec": 1168.76,
-      "layout": "act-title-card",
+      "actId": "act-5",
+      "startSegmentId": "seg-28",
+      "endSegmentId": "seg-30",
+      "startSec": 875.38,
+      "endSec": 971.4,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A biting op-ed cartoon PPT slide on TV news grammar. Top hand-lettered Chinese title: \"电视新闻的万能转场：“好……现在”\". Center sketch: a polished smiling TV anchor behind a desk; the screen behind is slashed diagonally by a jagged red lightning bolt—left half shows somber smoky crisis scenes (\"45秒灾难新闻\"), right half bursts into a cheerful juicy hamburger ad and sports trophy (\"秒切汉堡广告与比分\"). Small margin note: \"相貌决定可信度\".",
+      "imageFile": "scene-17.png",
       "overlay": {
-        "chapterTag": "第六幕 · 第 9–10 章",
-        "headline": "30 秒选票疗法与《芝麻街》：政治、广告和教室",
-        "quoteZh": "从商业心理疗法到选票包装，再到必须逗笑学生的课堂。"
-      }
+        "chapterTag": "第五幕 · 新闻的娱乐化",
+        "headline": "45 秒灾难后一句“好……现在”，瞬间切入广告"
+      },
+      "promptHash": "e47d662c60e6"
     },
     {
       "sceneId": "scene-18",
-      "actId": "act-6",
-      "startSegmentId": "seg-37",
-      "endSegmentId": "seg-39",
-      "startSec": 1168.76,
-      "endSec": 1262.33,
-      "layout": "editorial-illustration",
-      "motion": "pan-right",
-      "imagePrompt": "Satirical political-column sketch: on the left, a bespectacled candidate staggers under a towering stack of heavy policy books ignored by the crowd; on the right, a suave rival stands beneath stage lights waving effortlessly inside a bright 30-second frame as floating ballots rush toward him, with a clock showing only a single present-tense hand.",
+      "actId": "act-5",
+      "startSegmentId": "seg-31",
+      "endSegmentId": "seg-32",
+      "startSec": 971.4,
+      "endSec": 1035.19,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A sharp editorial PPT slide on fragmented memory and disinformation. Top hand-lettered Chinese title: \"割裂的世界里，自相矛盾不存在\". Center visual metaphor: two completely contradictory statements floating inside separate bubble islands labeled \"昨日说法\" and \"今日说法\" with a broken bridge between them, while an unfazed viewer shrugs (\"一个在那里，一个在这里\"). Bold red marker definition box: \"假信息 ≠ 假话，而是让你误以为知情的碎片\".",
       "imageFile": "scene-18.png",
-      "promptHash": "2cc3ea73e96f",
+      "promptHash": "c321e8c48757",
       "overlay": {
-        "chapterTag": "第 9 章 · 伸出你的手投票",
-        "headline": "厚重政纲输给 30 秒形象广告，电视语法只有“现在时”"
+        "chapterTag": "第五幕 · 假信息的本质",
+        "headline": "里根误述无人关注：没有语境就没有矛盾"
       }
     },
     {
       "sceneId": "scene-19",
-      "actId": "act-6",
-      "startSegmentId": "seg-40",
-      "endSegmentId": "seg-42",
-      "startSec": 1262.33,
-      "endSec": 1375.83,
-      "layout": "editorial-illustration",
-      "motion": "zoom-in",
-      "imagePrompt": "Sharp editorial illustration of a classroom chalkboard scene: an exhausted schoolteacher in formal attire frantically balances on a unicycle juggling glowing colored balls and electric-guitar notes just to keep the gaze of bored students slouching at desks expecting nonstop entertainment.",
+      "actId": "act-5",
+      "startSegmentId": "seg-33",
+      "endSegmentId": "seg-35",
+      "startSec": 1035.19,
+      "endSec": 1133.41,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A witty satirical PPT slide on Televangelism. Top hand-lettered Chinese title: \"42小时电子教堂：当神坛搬进客厅\". Illustration: over-the-shoulder view of a casual viewer slumped on a living-room sofa holding a snack bag and a TV remote (\"客厅薯片 + 遥控器一秒换台\"), watching a dazzling showbiz preacher bathed in neon spotlights and rising ratings arrows. Bold vermilion Chinese callout: \"危险在于电视成为宗教的内容\".",
       "imageFile": "scene-19.png",
-      "promptHash": "8194d9ea1f5b",
+      "promptHash": "90bf670c7002",
       "overlay": {
-        "chapterTag": "第 10 章 · 杜威“附带学习”与 1.6 万小时屏幕",
-        "headline": "《芝麻街》教会了字母，却更深地教会孩子厌恶枯燥的思考"
+        "chapterTag": "第五幕 · 电子教堂观察",
+        "headline": "手握遥控器的客厅：电视成了宗教的内容"
       }
     },
     {
       "sceneId": "scene-20",
-      "actId": "act-7",
-      "startSegmentId": "seg-43",
-      "endSegmentId": "seg-46",
-      "startSec": 1375.83,
-      "endSec": 1511.59,
-      "layout": "editorial-illustration",
-      "motion": "zoom-out",
-      "imagePrompt": "Ironic editorial cartoon of a suburban family standing proudly beside a silent TV set crossed out with bold red tape, while outside their living-room window a frantic swarm of TV camera crews, boom mics, and bright floodlights film their boycott as the evening headline spectacle.",
+      "actId": "act-6",
+      "startSegmentId": "seg-36",
+      "endSegmentId": "seg-37",
+      "startSec": 1133.41,
+      "endSec": 1176.48,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "An editorial comparison PPT slide on how TV commercials rewired capitalism. Top hand-lettered Chinese title: \"30秒广告：瞬间心理疗法\". Left side: Adam Smith’s calm classical market scale weighing clear product specs and price tags (\"古典预设：理性货比三家\"). Right side with a bold red arrow: a warm 30-second TV melodrama glowing with hearts and comforting smiles soothing a stressed viewer’s anxiety (\"现代广告：不讲参数，兜售情绪慰藉\").",
       "imageFile": "scene-20.png",
-      "promptHash": "f386e7e68766",
+      "promptHash": "144cd1718820",
       "overlay": {
-        "chapterTag": "第 11 章 · 1984 巴布科克夫人的悖论",
-        "headline": "抵制电视本身被拍成了电视秀，只剩媒介意识教育这一条窄路"
+        "chapterTag": "第六幕 · 广告即心理疗法",
+        "headline": "从亚当·斯密的理性市场到 30 秒情绪小剧场"
       }
     },
     {
       "sceneId": "scene-21",
-      "actId": "act-7",
-      "startSegmentId": "seg-47",
-      "endSegmentId": "seg-49",
-      "startSec": 1511.59,
-      "endSec": 1614.34,
-      "layout": "editorial-illustration",
-      "motion": "pan-left",
-      "imagePrompt": "Editorial evolution sketch across white paper: a chunky 1985 CRT television box on the left shoots hurried red doodle arrows rightward, multiplying into dozens of glowing vertical smartphone screens and endless scrolling streams orbiting the silhouette of a modern commuter staring downward.",
+      "actId": "act-6",
+      "startSegmentId": "seg-38",
+      "endSegmentId": "seg-39",
+      "startSec": 1176.48,
+      "endSec": 1236.84,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A biting political-cartoon PPT slide on image-driven elections. Top hand-lettered Chinese title: \"政治话语舍弃了思想与历史\". Left sketch: a bespectacled candidate struggling under a towering stack of heavy policy books ignored by voters (\"厚重政纲惨败\"). Right sketch: a charismatic rival waving inside a bright 30-second TV frame pulling a rush of flying ballots (\"30秒形象广告胜出\"). Corner icon of a clock with only one hand labeled \"电视语法只有现在时 · 私营文化部\".",
       "imageFile": "scene-21.png",
-      "promptHash": "e3b85a34ed47",
+      "promptHash": "9575bbb8701c",
       "overlay": {
-        "chapterTag": "方法与当代回看边界",
-        "headline": "从 1985 三大广播网到今天的算法短视频瀑布流"
+        "chapterTag": "第六幕 · 选票包装与现在时",
+        "headline": "厚重政纲输给 30 秒形象广告，历史退为灰色混沌"
       }
     },
     {
       "sceneId": "scene-22",
-      "actId": "act-7",
-      "startSegmentId": "seg-50",
-      "endSegmentId": "seg-51",
-      "startSec": 1614.34,
-      "endSec": 1667.44,
-      "layout": "quote-spotlight",
+      "actId": "act-6",
+      "startSegmentId": "seg-40",
+      "endSegmentId": "seg-41",
+      "startSec": 1236.84,
+      "endSec": 1304.86,
+      "layout": "ppt-slide",
       "motion": "static",
+      "imagePrompt": "A clever editorial PPT slide about Dewey’s Collateral Learning and TV education. Top hand-lettered Chinese title: \"电视教学的三条铁律\". Left sketch: a dramatic $3.65M sailing-ship adventure TV crew filming a whale for city schoolchildren (\"365万美元《咪咪见闻录》：只因最好拍\"). Right hand-drawn checklist card with bold marker ticks titled \"杜威·附带学习\": \"① 不设前提条件\" / \"② 不能让人困惑\" / \"③ 避开长篇阐述\".",
+      "imageFile": "scene-22.png",
       "overlay": {
-        "chapterTag": "全书终极核心命题",
-        "quoteZh": "文化灭亡不必等待强权禁书与真理部的暴政，只要公共话语心甘情愿地按娱乐业逻辑自我改写，人就会在毫无痛感的笑声中丧失严肃思考与历史记忆的能力。",
-        "quoteSource": "尼尔·波兹曼《娱乐至死》全书收束"
-      }
+        "chapterTag": "第六幕 · 教学的娱乐化",
+        "headline": "杜威“附带学习”与电视教学的三条铁律"
+      },
+      "promptHash": "c97b11cf38e6"
     },
     {
       "sceneId": "scene-23",
+      "actId": "act-6",
+      "startSegmentId": "seg-42",
+      "endSegmentId": "seg-42",
+      "startSec": 1304.86,
+      "endSec": 1346.26,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A memorable satirical PPT slide on Sesame Street and classroom entertainment. Top hand-lettered Chinese title: \"1.6万小时屏幕与《芝麻街》悖论\". Center sketch: an exhausted schoolteacher balancing on a unicycle juggling glowing colored balls and rock-guitar notes in front of chalkboard letters, trying to hold bored students’ gaze. Bold hand-lettered Chinese callout: \"它鼓励孩子热爱的不是学校，而是电视\".",
+      "imageFile": "scene-23.png",
+      "overlay": {
+        "chapterTag": "第六幕 · 教室里的马戏团",
+        "headline": "中学毕业前 1.6 万小时屏幕：鼓励热爱的是电视"
+      },
+      "promptHash": "c68f71c6db82"
+    },
+    {
+      "sceneId": "scene-24",
       "actId": "act-7",
-      "startSegmentId": "seg-52",
+      "startSegmentId": "seg-43",
+      "endSegmentId": "seg-45",
+      "startSec": 1346.26,
+      "endSec": 1437.32,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "An ironic editorial cartoon PPT slide depicting Mrs. Babcock’s 1984 paradox. Top hand-lettered Chinese title: \"1984 巴布科克夫人的悖论\". Center illustration: a proud suburban family standing next to a silent TV taped over with a bold red X (\"一个月不看电视\"), while outside their window a frantic swarm of TV news cameras and boom mics film them excitedly. Bold red-underlined Chinese punchline: \"对电视的批评，最后仍依赖电视本身\".",
+      "imageFile": "scene-24.png",
+      "overlay": {
+        "chapterTag": "第七幕 · 赫胥黎的警告",
+        "headline": "抵制电视本身被拍成了电视秀"
+      },
+      "promptHash": "928aa596a89b"
+    },
+    {
+      "sceneId": "scene-25",
+      "actId": "act-7",
+      "startSegmentId": "seg-46",
+      "endSegmentId": "seg-47",
+      "startSec": 1437.32,
+      "endSec": 1514.38,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A thoughtful editorial diagram PPT slide on Media Ecology and education. Top hand-lettered Chinese title: \"唯一窄路：教育与灾难的竞赛\". Upper visual: a tightrope walker carrying a glowing lantern labeled \"媒介意识教育\" crossing a chasm between two sketchy cliffs (\"追问信息的来源与形式\"). Lower balanced scale sketch showing both print and TV have trade-offs, labeled \"拒绝简单技术决定论 · 保持清醒尺度\".",
+      "imageFile": "scene-25.png",
+      "overlay": {
+        "chapterTag": "第七幕 · 窄路与方法边界",
+        "headline": "媒介意识教育，与媒介生态学的清醒边界"
+      },
+      "promptHash": "809afe34489a"
+    },
+    {
+      "sceneId": "scene-26",
+      "actId": "act-7",
+      "startSegmentId": "seg-48",
+      "endSegmentId": "seg-49",
+      "startSec": 1514.38,
+      "endSec": 1580.77,
+      "layout": "ppt-slide",
+      "motion": "static",
+      "imagePrompt": "A striking modern editorial PPT slide bridging 1985 to today’s smartphones. Top hand-lettered Chinese title: \"40年后：写字台与拉斯维加斯装进同一只口袋\". Left side: a chunky 1985 CRT television sending sketchy red arrows rightward into a single glowing modern smartphone screen split in two—one half showing a neon Las Vegas slot-machine short-video waterfall (\"算法短视频\"), the other half showing a calm desk lamp, notebook, and deep discussion (\"长文写作与查证\").",
+      "imageFile": "scene-26.png",
+      "overlay": {
+        "chapterTag": "第七幕 · 当代回看边界",
+        "headline": "印刷写字台与拉斯维加斯舞台，塞进同一只手机口袋"
+      },
+      "promptHash": "69924e7a9926"
+    },
+    {
+      "sceneId": "scene-27",
+      "actId": "act-7",
+      "startSegmentId": "seg-50",
       "endSegmentId": "seg-52",
-      "startSec": 1667.44,
-      "endSec": 1690.61,
-      "layout": "closing-card",
+      "startSec": 1580.77,
+      "endSec": 1654.25,
+      "layout": "ppt-closing",
       "motion": "static",
       "overlay": {
-        "chapterTag": "本期全书深读完结",
-        "headline": "《娱乐至死》· 尼尔·波兹曼",
-        "quoteZh": "愿我们在笑声之外，依然保有一份面向严肃问题停下来追问的清醒。",
-        "quoteSource": "章艳 译 · 中信出版社 2015"
+        "chapterTag": "全书终极命题 · 完结",
+        "headline": "当心认真的事，也必须长得像娱乐",
+        "quoteZh": "文化灭亡不必等待强权禁书与真理部的暴政，只要公共话语心甘情愿地按娱乐业逻辑自我改写，人就会在毫无痛感的笑声中，慢慢丧失严肃思考与历史记忆的能力。",
+        "quoteSource": "尼尔·波兹曼《娱乐至死》 · 章艳 译 · 中信出版社 2015"
       }
     }
   ]

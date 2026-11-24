@@ -16,6 +16,21 @@ const execFileAsync = promisify(execFile);
 const FFMPEG_BIN = process.env.FFMPEG_PATH?.trim() || ffmpegStatic || 'ffmpeg';
 const FFPROBE_BIN = process.env.FFPROBE_PATH?.trim() || ffprobeStatic?.path || 'ffprobe';
 
+const FONT_FILES = [
+  {
+    name: 'NotoSansCJKsc-Medium.otf',
+    url: 'https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Medium.otf',
+  },
+  {
+    name: 'NotoSansCJKsc-Bold.otf',
+    url: 'https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf',
+  },
+  {
+    name: 'NotoSerifCJKsc-Bold.otf',
+    url: 'https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Bold.otf',
+  },
+];
+
 function readArg(args: string[], flag: string, fallback: string): string {
   const idx = args.indexOf(flag);
   if (idx >= 0 && args[idx + 1]) {
@@ -34,7 +49,7 @@ interface SubtitleCue {
 }
 
 /**
- * Splits a spoken segment into crisp 18-32 char subtitle cues aligned proportionally
+ * Splits a spoken segment into crisp single-line captions (12-24 chars) aligned proportionally
  * within the segment's exact [startSec, endSec] audio window.
  */
 function buildSubtitleCues(
@@ -46,7 +61,7 @@ function buildSubtitleCues(
   endSec: number
 ): SubtitleCue[] {
   const rawClauses = plainText
-    .split(/(?<=[。！？；：，、——])/)
+    .split(/(?<=[。！？；：，、])|(?<=——)/)
     .map((s) => s.trim())
     .filter(Boolean);
 
@@ -55,7 +70,7 @@ function buildSubtitleCues(
   for (const clause of rawClauses) {
     if (!buf) {
       buf = clause;
-    } else if (buf.length + clause.length <= 32) {
+    } else if (buf.length + clause.length <= 22) {
       buf += clause;
     } else {
       merged.push(buf);
@@ -66,30 +81,39 @@ function buildSubtitleCues(
 
   const finalChunks: string[] = [];
   for (const item of merged) {
-    if (item.length <= 36) {
+    if (item.length <= 25) {
       finalChunks.push(item);
     } else {
-      for (let i = 0; i < item.length; i += 30) {
-        finalChunks.push(item.slice(i, i + 30));
+      // Split evenly into balanced pieces <= 24 chars
+      const parts = Math.ceil(item.length / 22);
+      const step = Math.ceil(item.length / parts);
+      for (let i = 0; i < item.length; i += step) {
+        finalChunks.push(item.slice(i, i + step));
       }
     }
   }
 
-  const totalChars = finalChunks.reduce((acc, s) => acc + Math.max(1, s.length), 0);
-  const span = Math.max(0.5, endSec - startSec);
+  const cleanedChunks = finalChunks
+    .map((c) => c.replace(/[，。；、：—]+$/g, '').replace(/^—+/g, '').trim())
+    .filter(Boolean);
+
+  if (cleanedChunks.length === 0) return [];
+
+  const totalChars = cleanedChunks.reduce((acc, s) => acc + Math.max(1, s.length), 0);
+  const span = Math.max(0.4, endSec - startSec);
   let cursor = startSec;
 
-  return finalChunks.map((text, idx) => {
+  return cleanedChunks.map((text, idx) => {
     const share = (Math.max(1, text.length) / totalChars) * span;
     const cueStart = cursor;
-    const cueEnd = idx === finalChunks.length - 1 ? endSec : cursor + share;
+    const cueEnd = idx === cleanedChunks.length - 1 ? endSec : cursor + share;
     cursor = cueEnd;
     return {
       id: `${segmentId}-sub-${idx + 1}`,
       actId,
       hostId,
-      startSec: Number(cueStart.toFixed(2)),
-      endSec: Number(cueEnd.toFixed(2)),
+      startSec: Number(cueStart.toFixed(3)),
+      endSec: Number(cueEnd.toFixed(3)),
       text,
     };
   });
@@ -101,6 +125,21 @@ async function fileExistsNonEmpty(p: string, minBytes = 1024): Promise<boolean> 
     return stat.size > minBytes;
   } catch {
     return false;
+  }
+}
+
+async function ensureFontsCached(fontsDir: string): Promise<void> {
+  await fs.mkdir(fontsDir, { recursive: true });
+  for (const font of FONT_FILES) {
+    const target = path.join(fontsDir, font.name);
+    if (await fileExistsNonEmpty(target, 100_000)) continue;
+    console.log(`[fonts] Downloading ${font.name} -> .cache/fonts/...`);
+    const res = await fetch(font.url, { signal: AbortSignal.timeout(120_000) });
+    if (!res.ok) {
+      throw new Error(`下载中文字体失败 (${res.status}): ${font.url}`);
+    }
+    const buf = Buffer.from(await res.arrayBuffer());
+    await fs.writeFile(target, buf);
   }
 }
 
@@ -125,81 +164,28 @@ async function detectBrowserExecutable(): Promise<string | null> {
   return null;
 }
 
-/**
- * Pre-resizes multi-megabyte raw PNG frames into lightweight JPEGs inside `.cache/video/<slug>/frames-opt/`
- * so Chromium decodes illustrations far faster during headless frame rendering.
- */
-async function prepareOptimizedFrames(
-  bookArtifactsDir: string,
-  cacheRoot: string,
-  storyboard: VideoStoryboard,
-  maxWidth: number
-): Promise<Map<string, string>> {
-  const optDir = path.join(cacheRoot, `frames-opt-${maxWidth}`);
-  await fs.mkdir(optDir, { recursive: true });
-  const map = new Map<string, string>();
-
-  for (const scene of storyboard.scenes) {
-    if (!scene.imageFile) continue;
-    const srcPath = path.join(bookArtifactsDir, 'video', 'frames', scene.imageFile);
-    await fs.access(srcPath).catch(() => {
-      throw new Error(
-        `缺少分镜插画文件：${srcPath}，请先运行 npm run video:image -- --book ${storyboard.bookSlug}`
-      );
-    });
-
-    const optName = `${path.parse(scene.imageFile).name}.jpg`;
-    const optPath = path.join(optDir, optName);
-
-    const srcStat = await fs.stat(srcPath);
-    let needConvert = true;
-    try {
-      const optStat = await fs.stat(optPath);
-      if (optStat.size > 1024 && optStat.mtimeMs >= srcStat.mtimeMs) {
-        needConvert = false;
-      }
-    } catch {
-      needConvert = true;
-    }
-
-    if (needConvert) {
-      await execFileAsync(FFMPEG_BIN, [
-        '-y',
-        '-i',
-        srcPath,
-        '-vf',
-        `scale='min(${maxWidth},iw)':-2`,
-        '-q:v',
-        '3',
-        optPath,
-      ]);
-    }
-    map.set(scene.imageFile, optPath);
-  }
-
-  return map;
-}
-
 function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   if (ext === '.mp3') return 'audio/mpeg';
   if (ext === '.png') return 'image/png';
   if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  if (ext === '.otf') return 'font/otf';
+  if (ext === '.ttf') return 'font/ttf';
   if (ext === '.json') return 'application/json';
   return 'application/octet-stream';
 }
 
 async function startAssetServer(
   rootDir: string,
-  optimizedFrames: Map<string, string>
+  fontsDir: string
 ): Promise<{ url: string; close: () => Promise<void> }> {
   const server = http.createServer(async (req, res) => {
     try {
       const reqPath = decodeURIComponent((req.url ?? '/').split('?')[0]);
-      const frameMatch = /^\/video\/frames\/([^/]+)$/.exec(reqPath);
       let fullPath: string;
-      if (frameMatch && optimizedFrames.has(frameMatch[1])) {
-        fullPath = optimizedFrames.get(frameMatch[1])!;
+      if (reqPath.startsWith('/__fonts/')) {
+        const fontName = path.basename(reqPath);
+        fullPath = path.join(fontsDir, fontName);
       } else {
         const safePath = path.normalize(reqPath).replace(/^(\.\.(\/|\\|$))+/, '');
         fullPath = path.join(rootDir, safePath);
@@ -215,6 +201,7 @@ async function startAssetServer(
       res.writeHead(200, {
         'Content-Length': stat.size,
         'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': mime,
       });
       res.end(data);
@@ -234,45 +221,117 @@ async function startAssetServer(
   };
 }
 
-interface ActChunkPlan {
-  actId: string;
-  indexLabel: string;
-  startFrame: number;
-  endFrame: number;
+function formatAssTime(sec: number): string {
+  const safe = Math.max(0, sec);
+  const h = Math.floor(safe / 3600);
+  const m = Math.floor((safe % 3600) / 60);
+  const s = Math.floor(safe % 60);
+  const cs = Math.min(99, Math.round((safe - Math.floor(safe)) * 100));
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
 }
 
-function buildActFrameChunks(
-  storyboard: VideoStoryboard,
-  actIds: Array<{ id: string; indexLabel: string }>,
-  fps: number,
-  totalFrames: number
-): ActChunkPlan[] {
-  const chunks: ActChunkPlan[] = [];
-  let cursorFrame = 0;
+function escapeAssText(text: string): string {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+    .replace(/\n/g, '\\N');
+}
 
-  for (let i = 0; i < actIds.length; i += 1) {
-    const act = actIds[i];
-    const actScenes = storyboard.scenes.filter((s) => s.actId === act.id);
-    const isLast = i === actIds.length - 1;
-    let endFrame = totalFrames - 1;
+function escapeFfmpegFilterPath(p: string): string {
+  return p.replace(/\\/g, '/').replace(/:/g, '\\:').replace(/'/g, "\\'");
+}
 
-    if (!isLast && actScenes.length > 0) {
-      const actEndSec = actScenes[actScenes.length - 1].endSec;
-      endFrame = Math.min(totalFrames - 1, Math.max(cursorFrame, Math.round(actEndSec * fps) - 1));
-    }
+function estimateCaptionPixelWidth(text: string, fontSize: number, letterSpacing: number): number {
+  let width = 0;
+  for (const ch of text) {
+    const code = ch.codePointAt(0) ?? 0;
+    const isNarrow = code < 0x2e80;
+    width += (isNarrow ? fontSize * 0.56 : fontSize * 1.02) + letterSpacing;
+  }
+  return width;
+}
 
-    if (cursorFrame <= endFrame) {
-      chunks.push({
-        actId: act.id,
-        indexLabel: act.indexLabel,
-        startFrame: cursorFrame,
-        endFrame,
-      });
-      cursorFrame = endFrame + 1;
-    }
+function buildRoundedRectAssPath(w: number, h: number, r: number): string {
+  const rad = Math.min(r, Math.floor(w / 2), Math.floor(h / 2));
+  return [
+    `m ${rad} 0`,
+    `l ${w - rad} 0`,
+    `b ${w} 0 ${w} 0 ${w} ${rad}`,
+    `l ${w} ${h - rad}`,
+    `b ${w} ${h} ${w} ${h} ${w - rad} ${h}`,
+    `l ${rad} ${h}`,
+    `b 0 ${h} 0 ${h} 0 ${h - rad}`,
+    `l 0 ${rad}`,
+    `b 0 0 0 0 ${rad} 0`,
+  ].join(' ');
+}
+
+/**
+ * Generates a studio-styled ASS subtitle file for a single slide window [slideStartSec, slideEndSec],
+ * drawing a crisp rounded dark-ink frosted pill (Layer 0) behind Noto Sans CJK SC text (Layer 1).
+ * No speaker badges, invisible during silence gaps.
+ */
+function buildSlideAssContent(
+  cues: SubtitleCue[],
+  slideStartSec: number,
+  slideEndSec: number,
+  width: number,
+  height: number
+): string {
+  const scale = width / 1920;
+  const fontSize = Math.round(36 * scale);
+  const letterSpacing = Number((1.4 * scale).toFixed(1));
+  const pillH = Math.round(62 * scale);
+  const padX = Math.round(64 * scale);
+  const radius = Math.round(13 * scale);
+  const centerY = Math.round(height - 54 * scale);
+  const pillY = Math.round(centerY - pillH / 2);
+  const centerX = Math.round(width / 2);
+
+  const lines: string[] = [
+    '[Script Info]',
+    'ScriptType: v4.00+',
+    `PlayResX: ${width}`,
+    `PlayResY: ${height}`,
+    'ScaledBorderAndShadow: yes',
+    'WrapStyle: 2',
+    '',
+    '[V4+ Styles]',
+    'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
+    `Style: Caption,Noto Sans CJK SC Medium,${fontSize},&H00F9FAFA,&H00F9FAFA,&H00000000,&H00000000,0,0,0,0,100,100,${letterSpacing},0,1,0,0,5,60,60,30,1`,
+    `Style: Pill,Noto Sans CJK SC Medium,${fontSize},&H28151618,&H28151618,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1`,
+    '',
+    '[Events]',
+    'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
+  ];
+
+  const slideDuration = Math.max(0.1, slideEndSec - slideStartSec);
+
+  for (const cue of cues) {
+    if (cue.endSec <= slideStartSec || cue.startSec >= slideEndSec) continue;
+    const localStart = Math.max(0, cue.startSec - slideStartSec);
+    const localEnd = Math.min(slideDuration, cue.endSec - slideStartSec);
+    if (localEnd - localStart < 0.08) continue;
+
+    const startStr = formatAssTime(localStart);
+    const endStr = formatAssTime(localEnd);
+    const textW = estimateCaptionPixelWidth(cue.text, fontSize, letterSpacing);
+    const pillW = Math.min(width - Math.round(120 * scale), Math.max(Math.round(140 * scale), Math.round(textW + padX)));
+    const pillX = Math.round((width - pillW) / 2);
+    const pathStr = buildRoundedRectAssPath(pillW, pillH, radius);
+
+    // Layer 0: Rounded dark-ink frosted pill
+    lines.push(
+      `Dialogue: 0,${startStr},${endStr},Pill,,0,0,0,,{\\an7\\pos(${pillX},${pillY})\\bord0\\shad0\\c&H151618&\\alpha&H28&\\fad(70,70)\\p1}${pathStr}`
+    );
+    // Layer 1: Warm-white crisp caption text
+    lines.push(
+      `Dialogue: 1,${startStr},${endStr},Caption,,0,0,0,,{\\an5\\pos(${centerX},${centerY})\\bord0\\shad0\\c&HF9FAFA&\\fad(70,70)}${escapeAssText(cue.text)}`
+    );
   }
 
-  return chunks;
+  return `${lines.join('\n')}\n`;
 }
 
 async function concatVideoChunksWithAudio(
@@ -325,23 +384,33 @@ async function concatVideoChunksWithAudio(
 async function main() {
   const args = process.argv.slice(2);
   const bookSlug = readArg(args, '--book', 'amusing-ourselves-to-death');
-  const preset = readArg(args, '--preset', 'fast'); // 'fast' (720p 20fps) | 'hd' (1080p 24fps)
+  const preset = readArg(args, '--preset', 'hd'); // 'hd' (1920x1080 24fps) | 'fast' (1280x720 20fps)
   const useCache = !args.includes('--no-cache');
 
-  const defaultFps = preset === 'hd' ? 24 : 20;
-  const defaultScale = preset === 'hd' ? 1 : 2 / 3; // exact 1280x720 from 1920x1080
+  const defaultFps = preset === 'fast' ? 20 : 24;
+  const defaultWidth = preset === 'fast' ? 1280 : 1920;
+  const defaultHeight = preset === 'fast' ? 720 : 1080;
   const renderFps = Number.parseInt(readArg(args, '--fps', String(defaultFps)), 10);
-  const scaleArg = Number.parseFloat(readArg(args, '--scale', String(defaultScale)));
-  const concurrencyArg = Number.parseInt(readArg(args, '--concurrency', '12'), 10);
-  const crfArg = Number.parseInt(readArg(args, '--crf', '24'), 10);
-  const jpegQuality = Number.parseInt(readArg(args, '--jpeg-quality', '88'), 10);
+  const outWidth = Number.parseInt(readArg(args, '--width', String(defaultWidth)), 10);
+  const outHeight = Number.parseInt(readArg(args, '--height', String(defaultHeight)), 10);
+  const crfArg = Number.parseInt(readArg(args, '--crf', '22'), 10);
+  const fadeSecDefault = Number.parseFloat(readArg(args, '--fade', '0.35'));
+  const clipConcurrency = Math.max(
+    1,
+    Math.min(6, Number.parseInt(readArg(args, '--workers', '4'), 10) || 4)
+  );
 
   const bookArtifactsDir = path.resolve(process.cwd(), 'artifacts', bookSlug);
   const storyboardPath = path.join(bookArtifactsDir, 'video', 'storyboard.json');
   const outputPath = path.join(bookArtifactsDir, 'video', 'final.mp4');
   const cacheRoot = path.resolve(process.cwd(), '.cache', 'video', bookSlug);
-  const chunksCacheDir = path.join(cacheRoot, 'chunks');
-  await fs.mkdir(chunksCacheDir, { recursive: true });
+  const slidesCacheDir = path.join(cacheRoot, 'slides');
+  const clipsCacheDir = path.join(cacheRoot, 'slide-clips');
+  const fontsDir = path.resolve(process.cwd(), '.cache', 'fonts');
+
+  await fs.mkdir(slidesCacheDir, { recursive: true });
+  await fs.mkdir(clipsCacheDir, { recursive: true });
+  await ensureFontsCached(fontsDir);
 
   const storyboard = JSON.parse(await fs.readFile(storyboardPath, 'utf8')) as VideoStoryboard;
   const episode = getPodcastEpisodeByBookSlug(bookSlug);
@@ -366,16 +435,18 @@ async function main() {
   };
   const timingsMap = new Map(timingsPayload.timings.map((t) => [t.segmentId, t]));
 
-  const targetFrameWidth = Math.round(storyboard.width * scaleArg);
-  console.log(
-    `[render] Optimizing source illustrations for ${targetFrameWidth}px width...`
-  );
-  const optimizedFrames = await prepareOptimizedFrames(
-    bookArtifactsDir,
-    cacheRoot,
-    storyboard,
-    Math.max(960, targetFrameWidth)
-  );
+  // Validate all referenced illustration frames exist before starting
+  const frameMtimes = new Map<string, number>();
+  for (const scene of storyboard.scenes) {
+    if (!scene.imageFile) continue;
+    const framePath = path.join(bookArtifactsDir, 'video', 'frames', scene.imageFile);
+    const stat = await fs.stat(framePath).catch(() => {
+      throw new Error(
+        `缺少分镜插画文件：${framePath}，请先运行 npm run video:image -- --book ${bookSlug}`
+      );
+    });
+    frameMtimes.set(scene.imageFile, Math.round(stat.mtimeMs));
+  }
 
   const subtitles: SubtitleCue[] = [];
   for (const seg of episode.segments) {
@@ -385,158 +456,311 @@ async function main() {
     subtitles.push(...buildSubtitleCues(seg.id, seg.actId, seg.hostId, plain, t.startSec, t.endSec));
   }
 
+  const overallStart = Date.now();
+  console.log(
+    `[render-v2] Zero-Redundant-Frame PPT Engine | ${outWidth}x${outHeight} @ ${renderFps}fps | ${storyboard.scenes.length} slides | ${subtitles.length} captions | fade=${fadeSecDefault}s`
+  );
+
+  // ==================== STAGE 1: Render ONLY N Base PPT Slides via Remotion renderStill ====================
   const remotionDir = path.resolve(process.cwd(), 'pipelines', 'video', 'remotion');
   const remotionRequire = createRequire(path.join(remotionDir, 'package.json'));
   const { bundle } = remotionRequire('@remotion/bundler') as {
     bundle: (opts: { entryPoint: string }) => Promise<string>;
   };
-  const { selectComposition, renderMedia } = remotionRequire('@remotion/renderer') as {
+  const { openBrowser, selectComposition, renderStill } = remotionRequire('@remotion/renderer') as {
+    openBrowser: (
+      browserType: 'chrome',
+      opts?: Record<string, unknown>
+    ) => Promise<{ close: (opts?: Record<string, unknown>) => Promise<void> }>;
     selectComposition: (opts: Record<string, unknown>) => Promise<Record<string, unknown>>;
-    renderMedia: (opts: Record<string, unknown>) => Promise<void>;
+    renderStill: (opts: Record<string, unknown>) => Promise<void>;
   };
 
-  const browserExecutable = await detectBrowserExecutable();
-  console.log(
-    `[render] Preset=${preset} (${Math.round(storyboard.width * scaleArg)}x${Math.round(storyboard.height * scaleArg)} @ ${renderFps}fps, jpeg=${jpegQuality}, x264=veryfast, concurrency=${concurrencyArg})`
-  );
-  console.log(`[render] Browser: ${browserExecutable ?? 'Remotion managed Chromium'}`);
+  const slidePngPaths: string[] = [];
+  const slidesToRender: Array<{ index: number; outPath: string }> = [];
 
-  const serveUrl = await bundle({
-    entryPoint: path.join(remotionDir, 'src', 'index.ts'),
-  });
+  for (let i = 0; i < storyboard.scenes.length; i += 1) {
+    const scene = storyboard.scenes[i];
+    const slideHash = crypto
+      .createHash('sha256')
+      .update(
+        JSON.stringify({
+          v: 5,
+          scene,
+          index: i,
+          total: storyboard.scenes.length,
+          outWidth,
+          outHeight,
+          imageMtime: scene.imageFile ? frameMtimes.get(scene.imageFile) ?? 0 : 0,
+        })
+      )
+      .digest('hex')
+      .slice(0, 12);
 
-  const assetServer = await startAssetServer(bookArtifactsDir, optimizedFrames);
-  const overallStart = Date.now();
+    const slidePath = path.join(slidesCacheDir, `${scene.sceneId}-${slideHash}.png`);
+    slidePngPaths.push(slidePath);
+    if (!useCache || !(await fileExistsNonEmpty(slidePath))) {
+      slidesToRender.push({ index: i, outPath: slidePath });
+    }
+  }
 
-  try {
-    const inputProps = {
-      bookTitle: storyboard.bookTitle,
-      episodeTitle: storyboard.episodeTitle,
-      // Audio is muxed cleanly once at the end via ffmpeg to guarantee zero seams across act chunks
-      audioUrl: '',
-      assetBaseUrl: assetServer.url,
-      fps: renderFps,
-      width: storyboard.width,
-      height: storyboard.height,
-      totalDurationSec: storyboard.totalDurationSec,
-      hosts: {
-        A: { name: episode.hosts.A.name, role: episode.hosts.A.role },
-        B: { name: episode.hosts.B.name, role: episode.hosts.B.role },
-      },
-      acts: episode.acts.map((a) => ({
-        id: a.id,
-        indexLabel: a.indexLabel,
-        title: a.title,
-      })),
-      scenes: storyboard.scenes,
-      subtitles,
-    };
+  if (slidesToRender.length > 0) {
+    const stillStart = Date.now();
+    const browserExecutable = await detectBrowserExecutable();
+    console.log(
+      `[stage-1] Rendering ${slidesToRender.length}/${storyboard.scenes.length} unique base PPT slides (cache hits: ${storyboard.scenes.length - slidesToRender.length})...`
+    );
 
-    const composition = await selectComposition({
-      serveUrl,
-      id: 'PodcastVideo',
-      inputProps,
+    const serveUrl = await bundle({
+      entryPoint: path.join(remotionDir, 'src', 'index.ts'),
+    });
+    const assetServer = await startAssetServer(bookArtifactsDir, fontsDir);
+    const browser = await openBrowser('chrome', {
       ...(browserExecutable ? { browserExecutable } : {}),
     });
 
-    const totalFrames = Number(composition.durationInFrames ?? 0);
-    const actChunks = buildActFrameChunks(
-      storyboard,
-      episode.acts.map((a) => ({ id: a.id, indexLabel: a.indexLabel })),
-      renderFps,
-      totalFrames
-    );
+    try {
+      const baseProps = {
+        bookTitle: storyboard.bookTitle,
+        episodeTitle: storyboard.episodeTitle,
+        audioUrl: '',
+        assetBaseUrl: assetServer.url,
+        fps: renderFps,
+        width: storyboard.width,
+        height: storyboard.height,
+        totalDurationSec: storyboard.totalDurationSec,
+        acts: episode.acts.map((a) => ({
+          id: a.id,
+          indexLabel: a.indexLabel,
+          title: a.title,
+        })),
+        scenes: storyboard.scenes,
+        subtitles: [],
+        hideSubtitle: true,
+      };
 
-    console.log(
-      `[render] Segmented rendering across ${actChunks.length} acts (${totalFrames} total frames)...`
-    );
+      const composition = await selectComposition({
+        serveUrl,
+        id: 'PodcastVideo',
+        inputProps: baseProps,
+        puppeteerInstance: browser,
+      });
 
-    const chunkOutputPaths: string[] = [];
-    for (let i = 0; i < actChunks.length; i += 1) {
-      const chunk = actChunks[i];
-      const actScenes = storyboard.scenes.filter((s) => s.actId === chunk.actId);
-      const actSubs = subtitles.filter((s) => s.actId === chunk.actId);
-      const chunkHash = crypto
+      const scale = outWidth / storyboard.width;
+      for (let k = 0; k < slidesToRender.length; k += 1) {
+        const target = slidesToRender[k];
+        const tmpPng = `${target.outPath}.tmp.png`;
+        const slideProps = {
+          ...baseProps,
+          forceSceneIndex: target.index,
+        };
+        await renderStill({
+          composition: {
+            ...composition,
+            props: slideProps,
+          },
+          serveUrl,
+          output: tmpPng,
+          frame: 30,
+          scale,
+          imageFormat: 'png',
+          inputProps: slideProps,
+          puppeteerInstance: browser,
+        });
+        await fs.rename(tmpPng, target.outPath);
+        if ((k + 1) % 5 === 0 || k === slidesToRender.length - 1) {
+          console.log(
+            `  [slides] ${k + 1}/${slidesToRender.length} rendered (${Math.round((Date.now() - stillStart) / 1000)}s)`
+          );
+        }
+      }
+    } finally {
+      await browser.close({ silent: true });
+      await assetServer.close();
+    }
+  } else {
+    console.log(`[stage-1] All ${storyboard.scenes.length} base PPT slides loaded from cache.`);
+  }
+
+  // ==================== STAGE 2: Parallel Native FFmpeg Slide Clips + Crossfade + ASS Subtitles ====================
+  const totalFrames = Math.ceil(storyboard.totalDurationSec * renderFps);
+  const clipPlans = storyboard.scenes.map((scene, idx) => {
+    const startFrame = idx === 0 ? 0 : Math.round(scene.startSec * renderFps);
+    const endFrame =
+      idx === storyboard.scenes.length - 1
+        ? totalFrames
+        : Math.round(scene.endSec * renderFps);
+    const frameCount = Math.max(renderFps, endFrame - startFrame);
+    return {
+      idx,
+      scene,
+      startFrame,
+      endFrame,
+      frameCount,
+      startSec: startFrame / renderFps,
+      endSec: (startFrame + frameCount) / renderFps,
+      durationSec: frameCount / renderFps,
+    };
+  });
+
+  const clipOutputPaths: string[] = new Array(clipPlans.length);
+  const stage2Start = Date.now();
+  let cursor = 0;
+  let completedClips = 0;
+
+  console.log(
+    `[stage-2] Synthesizing ${clipPlans.length} slide clips with crossfade + styled captions (${clipConcurrency} parallel FFmpeg workers)...`
+  );
+
+  const workers = Array.from({ length: Math.min(clipConcurrency, clipPlans.length) }, async () => {
+    while (true) {
+      const idx = cursor;
+      cursor += 1;
+      if (idx >= clipPlans.length) break;
+
+      const plan = clipPlans[idx];
+      const currSlidePng = slidePngPaths[idx];
+      const prevSlidePng = idx > 0 ? slidePngPaths[idx - 1] : null;
+      const assContent = buildSlideAssContent(
+        subtitles,
+        plan.startSec,
+        plan.endSec,
+        outWidth,
+        outHeight
+      );
+
+      const clipHash = crypto
         .createHash('sha256')
         .update(
           JSON.stringify({
-            v: 2,
+            v: 3,
+            outWidth,
+            outHeight,
             renderFps,
-            scaleArg,
             crfArg,
-            jpegQuality,
-            startFrame: chunk.startFrame,
-            endFrame: chunk.endFrame,
-            actScenes,
-            actSubs,
+            fadeSecDefault,
+            frameCount: plan.frameCount,
+            currSlide: path.basename(currSlidePng),
+            prevSlide: prevSlidePng ? path.basename(prevSlidePng) : null,
+            assContent,
           })
         )
         .digest('hex')
         .slice(0, 14);
 
-      const chunkPath = path.join(chunksCacheDir, `${chunk.actId}-${chunkHash}.mp4`);
-      chunkOutputPaths.push(chunkPath);
+      const clipPath = path.join(clipsCacheDir, `${plan.scene.sceneId}-${clipHash}.mp4`);
+      clipOutputPaths[idx] = clipPath;
 
-      if (useCache && (await fileExistsNonEmpty(chunkPath))) {
-        console.log(
-          `[cache-hit ${i + 1}/${actChunks.length}] ${chunk.indexLabel} (${chunk.endFrame - chunk.startFrame + 1} frames) -> ${path.basename(chunkPath)}`
-        );
+      if (useCache && (await fileExistsNonEmpty(clipPath))) {
+        completedClips += 1;
         continue;
       }
 
-      const tmpChunkPath = `${chunkPath}.tmp.mp4`;
-      const chunkStart = Date.now();
-      let lastPct = -25;
-      console.log(
-        `[act ${i + 1}/${actChunks.length}] Rendering ${chunk.indexLabel} (frames ${chunk.startFrame}..${chunk.endFrame}, ${chunk.endFrame - chunk.startFrame + 1} frames)...`
+      const assPath = path.join(clipsCacheDir, `${plan.scene.sceneId}-${clipHash}.ass`);
+      const tmpClipPath = `${clipPath}.tmp.mp4`;
+      await fs.writeFile(assPath, assContent, 'utf8');
+
+      const escapedAss = escapeFfmpegFilterPath(assPath);
+      const escapedFonts = escapeFfmpegFilterPath(fontsDir);
+      const fadeSec = prevSlidePng ? Math.min(fadeSecDefault, plan.durationSec * 0.4) : 0;
+
+      const ffArgs: string[] = ['-y', '-threads', '4'];
+      if (prevSlidePng && fadeSec >= 0.08) {
+        ffArgs.push(
+          '-loop',
+          '1',
+          '-framerate',
+          String(renderFps),
+          '-t',
+          fadeSec.toFixed(4),
+          '-i',
+          prevSlidePng,
+          '-loop',
+          '1',
+          '-framerate',
+          String(renderFps),
+          '-t',
+          (plan.durationSec + 0.1).toFixed(4),
+          '-i',
+          currSlidePng,
+          '-filter_complex',
+          `[0:v]fps=${renderFps},scale=${outWidth}:${outHeight},format=yuv420p,setsar=1[v0];[1:v]fps=${renderFps},scale=${outWidth}:${outHeight},format=yuv420p,setsar=1[v1];[v0][v1]xfade=transition=fade:duration=${fadeSec.toFixed(4)}:offset=0,ass='${escapedAss}':fontsdir='${escapedFonts}'[vout]`,
+          '-map',
+          '[vout]'
+        );
+      } else {
+        ffArgs.push(
+          '-loop',
+          '1',
+          '-framerate',
+          String(renderFps),
+          '-t',
+          (plan.durationSec + 0.1).toFixed(4),
+          '-i',
+          currSlidePng,
+          '-vf',
+          `fps=${renderFps},scale=${outWidth}:${outHeight},format=yuv420p,setsar=1,ass='${escapedAss}':fontsdir='${escapedFonts}'`
+        );
+      }
+
+      ffArgs.push(
+        '-frames:v',
+        String(plan.frameCount),
+        '-c:v',
+        'libx264',
+        '-preset',
+        'veryfast',
+        '-tune',
+        'stillimage',
+        '-crf',
+        String(crfArg),
+        '-g',
+        String(renderFps * 2),
+        '-pix_fmt',
+        'yuv420p',
+        '-an',
+        tmpClipPath
       );
 
-      await renderMedia({
-        composition,
-        serveUrl,
-        codec: 'h264',
-        muted: true,
-        imageFormat: 'jpeg',
-        jpegQuality,
-        x264Preset: 'veryfast',
-        crf: crfArg,
-        scale: scaleArg,
-        frameRange: [chunk.startFrame, chunk.endFrame],
-        outputLocation: tmpChunkPath,
-        inputProps,
-        concurrency: concurrencyArg,
-        ...(browserExecutable ? { browserExecutable } : {}),
-        ...(FFMPEG_BIN ? { ffmpegExecutable: FFMPEG_BIN } : {}),
-        ...(FFPROBE_BIN ? { ffprobeExecutable: FFPROBE_BIN } : {}),
-        onProgress: ({ progress }: { progress: number }) => {
-          const pct = Math.floor(progress * 100);
-          if (pct >= lastPct + 25) {
-            lastPct = pct;
-            console.log(
-              `  [${chunk.actId}] ${pct}% (${Math.round((Date.now() - chunkStart) / 1000)}s)`
-            );
-          }
-        },
-      });
+      try {
+        await execFileAsync(FFMPEG_BIN, ffArgs, { maxBuffer: 16 * 1024 * 1024 });
+        await fs.rename(tmpClipPath, clipPath);
+      } finally {
+        await fs.rm(tmpClipPath, { force: true });
+      }
 
-      await fs.rename(tmpChunkPath, chunkPath);
-      console.log(
-        `[act-done ${i + 1}/${actChunks.length}] ${chunk.indexLabel} finished in ${Math.round((Date.now() - chunkStart) / 1000)}s`
-      );
+      completedClips += 1;
+      if (completedClips % 5 === 0 || completedClips === clipPlans.length) {
+        console.log(
+          `  [clips] ${completedClips}/${clipPlans.length} done (${Math.round((Date.now() - stage2Start) / 1000)}s)`
+        );
+      }
     }
+  });
 
-    console.log(
-      `[mux] Concatenating ${chunkOutputPaths.length} act clips + muxing ${storyboard.audioProvider}.mp3 -> artifacts/${bookSlug}/video/final.mp4`
-    );
-    await concatVideoChunksWithAudio(chunkOutputPaths, audioFilePath, outputPath);
+  await Promise.all(workers);
 
-    const stat = await fs.stat(outputPath);
-    console.log(
-      `[done] artifacts/${bookSlug}/video/final.mp4 (${(stat.size / (1024 * 1024)).toFixed(1)} MB) total=${Math.round((Date.now() - overallStart) / 1000)}s`
-    );
-  } finally {
-    await assetServer.close();
-  }
+  // ==================== STAGE 3: Lossless Concat + Audio Mux ====================
+  console.log(
+    `[stage-3] Concatenating ${clipOutputPaths.length} slide clips + muxing ${storyboard.audioProvider}.mp3 -> artifacts/${bookSlug}/video/final.mp4`
+  );
+  await concatVideoChunksWithAudio(clipOutputPaths, audioFilePath, outputPath);
+
+  const stat = await fs.stat(outputPath);
+  const { stdout: probeOut } = await execFileAsync(FFPROBE_BIN, [
+    '-v',
+    'error',
+    '-show_entries',
+    'format=duration',
+    '-of',
+    'default=noprint_wrappers=1:nokey=1',
+    outputPath,
+  ]);
+  const finalDur = Number.parseFloat(probeOut.trim()) || storyboard.totalDurationSec;
+
+  console.log(
+    `[done] artifacts/${bookSlug}/video/final.mp4 | ${outWidth}x${outHeight} @ ${renderFps}fps | duration=${finalDur.toFixed(1)}s | size=${(stat.size / (1024 * 1024)).toFixed(1)} MB | elapsed=${Math.round((Date.now() - overallStart) / 1000)}s`
+  );
 }
 
 main().catch((err) => {

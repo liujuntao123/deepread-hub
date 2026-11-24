@@ -149,7 +149,7 @@ async function main() {
     episodeTitle: episode.episodeTitle,
     audioProvider: provider,
     aspectRatio: '16:9',
-    fps: 30,
+    fps: 24,
     width: 1920,
     height: 1080,
     totalDurationSec,

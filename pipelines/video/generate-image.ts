@@ -108,7 +108,14 @@ async function runStoryboardBatch(args: string[], bookSlug: string) {
     return;
   }
 
-  let updatedStoryboard = false;
+  let saveChain = Promise.resolve();
+  const flushStoryboard = () => {
+    saveChain = saveChain.then(() =>
+      fs.writeFile(storyboardPath, `${JSON.stringify(storyboard, null, 2)}\n`, 'utf8')
+    );
+    return saveChain;
+  };
+
   let cursor = 0;
   let doneCount = 0;
 
@@ -131,17 +138,35 @@ async function runStoryboardBatch(args: string[], bookSlug: string) {
         continue;
       }
 
-      const result = await generateImageAsync(
-        {
-          prompt: styledPrompt,
-          size,
-          onStatus: (m) => console.log(`[${scene.sceneId}] ${m}`),
-        },
-        config
-      );
+      let result: Awaited<ReturnType<typeof generateImageAsync>> | null = null;
+      let lastErr: unknown = null;
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        try {
+          result = await generateImageAsync(
+            {
+              prompt: styledPrompt,
+              size,
+              onStatus: (m) => console.log(`[${scene.sceneId}] ${m}`),
+            },
+            config
+          );
+          break;
+        } catch (err) {
+          lastErr = err;
+          const msg = err instanceof Error ? err.message : String(err);
+          console.warn(`[${scene.sceneId}] attempt ${attempt}/3 failed: ${msg}`);
+          if (attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 2500 * attempt));
+          }
+        }
+      }
+      if (!result) {
+        throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+      }
+
       await fs.writeFile(outPath, result.buffer);
       scene.promptHash = hash;
-      updatedStoryboard = true;
+      await flushStoryboard();
       doneCount += 1;
       console.log(
         `[done ${doneCount}/${targets.length}] ${scene.sceneId} -> artifacts/${bookSlug}/video/frames/${scene.imageFile} (${(result.buffer.length / 1024).toFixed(1)} KB)`
@@ -150,11 +175,8 @@ async function runStoryboardBatch(args: string[], bookSlug: string) {
   });
 
   await Promise.all(workers);
-
-  if (updatedStoryboard) {
-    await fs.writeFile(storyboardPath, `${JSON.stringify(storyboard, null, 2)}\n`, 'utf8');
-    console.log(`[updated] artifacts/${bookSlug}/video/storyboard.json (promptHash synced)`);
-  }
+  await saveChain;
+  console.log(`[updated] artifacts/${bookSlug}/video/storyboard.json (promptHash synced)`);
 }
 
 async function main() {
